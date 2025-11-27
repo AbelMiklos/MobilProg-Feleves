@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="GMYEL8.FelevesFeladat.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:GMYEL8.FelevesFeladat.Views"
+    Title="Jarmu koltseg nyilvantarto">
+
+    <FlyoutItem Title="Fooldal" Icon="home.png">
+        <ShellContent
+            Title="Fooldal"
+            ContentTemplate="{DataTemplate local:HomePage}"
+            Route="HomePage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Tankolasok" Icon="fuel.png">
+        <ShellContent
+            Title="Tankolasok"
+            ContentTemplate="{DataTemplate local:FuelRecordsPage}"
+            Route="FuelRecordsPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Koltsegek" Icon="expense.png">
+        <ShellContent
+            Title="Koltsegek"
+            ContentTemplate="{DataTemplate local:ExpensesPage}"
+            Route="ExpensesPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Statisztikak" Icon="statistics.png">
+        <ShellContent
+            Title="Statisztikak"
+            ContentTemplate="{DataTemplate local:StatisticsPage}"
+            Route="StatisticsPage" />
+    </FlyoutItem>
+
+</Shell>

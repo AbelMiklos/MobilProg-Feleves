@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:GMYEL8.FelevesFeladat.ViewModels"
+             x:Class="GMYEL8.FelevesFeladat.Views.FuelRecordsPage"
+             x:DataType="viewmodel:FuelRecordsViewModel"
+             Title="Tankolasok">
+
+    <Grid RowDefinitions="Auto,*" Padding="10">
+        
+        <Button Grid.Row="0"
+                Text="Uj tankolas"
+                Command="{Binding AddFuelRecordAsyncCommand}"
+                BackgroundColor="{StaticResource Primary}"
+                TextColor="White"
+                Margin="10"/>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding FuelRecords}"
+                        SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label Text="Nincs meg tankolas rogzitve"
+                           FontSize="18"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Kattints az 'Uj tankolas' gombra!"
+                           FontSize="14"
+                           TextColor="Gray"
+                           HorizontalOptions="Center"
+                           Margin="0,10,0,0"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5" 
+                           Padding="10" 
+                           BorderColor="LightGray"
+                           CornerRadius="8"
+                           HasShadow="True">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                            
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Text="{Binding Date, StringFormat='{0:yyyy.MM.dd}'}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"/>
+                            
+                            <Label Grid.Row="1" Grid.Column="0"
+                                   Text="{Binding Distance, StringFormat='Tavolsag: {0} km'}"/>
+                            
+                            <Label Grid.Row="2" Grid.Column="0"
+                                   Text="{Binding FuelAmount, StringFormat='Mennyiseg: {0} L'}"/>
+                            
+                            <Label Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding TotalCost, StringFormat='{0:F0} Ft'}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"/>
+                            
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Grid.RowSpan="2"
+                                                   VerticalOptions="Center"
+                                                   Spacing="5">
+                                <Button Text="Szerkeszt"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:FuelRecordsViewModel}}, Path=EditFuelRecordAsyncCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="Orange"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        Padding="10,5"/>
+                                
+                                <Button Text="Torol"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:FuelRecordsViewModel}}, Path=DeleteFuelRecordAsyncCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="Red"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        Padding="10,5"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
