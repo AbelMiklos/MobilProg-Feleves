@@ -1,14 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GMYEL8.FelevesFeladat.Models;
-using GMYEL8.FelevesFeladat.Services;
+using GMYEL8.FelevesFeladat.Domain.Entities;
+using GMYEL8.FelevesFeladat.Shared.Repositories;
 
 namespace GMYEL8.FelevesFeladat.ViewModels
 {
     [QueryProperty(nameof(FuelRecordId), "id")]
-    public partial class AddFuelViewModel : ObservableObject
+    public partial class AddFuelViewModel(IRepository<FuelRecord> repository) : ObservableObject
     {
-        private readonly DatabaseService _databaseService;
+        private readonly IRepository<FuelRecord> _repository = repository;
 
         [ObservableProperty]
         private int _fuelRecordId;
@@ -37,11 +37,6 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         [ObservableProperty]
         private bool _isEditMode;
 
-        public AddFuelViewModel(DatabaseService databaseService)
-        {
-            _databaseService = databaseService;
-        }
-
         partial void OnFuelRecordIdChanged(int value)
         {
             if (value > 0)
@@ -53,7 +48,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
 
         private async void LoadFuelRecordAsync(int id)
         {
-            var record = await _databaseService.GetFuelRecordAsync(id);
+            var record = await _repository.Table.FirstOrDefaultAsync(fuel => fuel.Id == id);
             if (record != null)
             {
                 Date = record.Date;
@@ -74,7 +69,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                 if (!ValidateInputs())
                     return;
 
-                var vehicles = await _databaseService.GetVehiclesAsync();
+                var vehicles = await _repository.Table.ToListAsync();
                 if (vehicles.Count == 0)
                 {
                     await Shell.Current.DisplayAlert("Hiba", "Nincs jármû megadva!", "OK");
@@ -94,7 +89,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                     Longitude = Longitude
                 };
 
-                await _databaseService.SaveFuelRecordAsync(fuelRecord);
+                await _repository.InsertAsync(fuelRecord);
                 await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)
@@ -144,7 +139,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                 {
                     Latitude = location.Latitude;
                     Longitude = location.Longitude;
-                    await Shell.Current.DisplayAlert("Sikeres", 
+                    await Shell.Current.DisplayAlert("Sikeres",
                         $"Hely mentve: {Latitude:F6}, {Longitude:F6}", "OK");
                 }
             }

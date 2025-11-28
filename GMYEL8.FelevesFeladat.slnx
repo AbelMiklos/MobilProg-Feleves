@@ -1,3 +1,8 @@
 <Solution>
-  <Project Path="GMYEL8.FelevesFeladat/GMYEL8.FelevesFeladat.csproj" />
+  <Project Path="GMYEL8.FelevesFeladat.Domain/GMYEL8.FelevesFeladat.Domain.csproj" Id="5c54bab4-53ae-4433-b019-30cf12c444bc" />
+  <Project Path="GMYEL8.FelevesFeladat.Infrastructure/GMYEL8.FelevesFeladat.Infrastructure.csproj" Id="fab09d75-5bc3-4cd4-a9a4-2a508cdf56a9" />
+  <Project Path="GMYEL8.FelevesFeladat.Shared/GMYEL8.FelevesFeladat.Shared.csproj" Id="56b3c67b-36f7-47d0-b016-833152a5d3cd" />
+  <Project Path="GMYEL8.FelevesFeladat/GMYEL8.FelevesFeladat.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>

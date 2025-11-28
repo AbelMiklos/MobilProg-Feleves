@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using GMYEL8.FelevesFeladat.Services;
+using GMYEL8.FelevesFeladat.Shared.Services;
 using GMYEL8.FelevesFeladat.Helpers;
 
 namespace GMYEL8.FelevesFeladat
@@ -20,12 +20,12 @@ namespace GMYEL8.FelevesFeladat
         {
             base.OnStart();
             
-            // Seed initial data
-            var databaseService = Handler?.MauiContext?.Services.GetService<DatabaseService>();
-            if (databaseService != null)
-            {
-                await SeedDataHelper.SeedDataAsync(databaseService);
-            }
+            //// Seed initial data
+            //var databaseService = Handler?.MauiContext?.Services.GetService<IDatabaseService>();
+            //if (databaseService != null)
+            //{
+            //    await SeedDataHelper.SeedDataAsync(databaseService);
+            //}
         }
     }
 }

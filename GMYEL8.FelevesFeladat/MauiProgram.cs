@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using GMYEL8.FelevesFeladat.Services;
+﻿using GMYEL8.FelevesFeladat.Domain.Entities;
+using GMYEL8.FelevesFeladat.Infrastructure.DependencyInjection;
 using GMYEL8.FelevesFeladat.ViewModels;
 using GMYEL8.FelevesFeladat.Views;
+using Microsoft.Extensions.Logging;
 
 namespace GMYEL8.FelevesFeladat
 {
@@ -16,14 +17,19 @@ namespace GMYEL8.FelevesFeladat
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                })
+                .UseDatabase(settings =>
+                {
+                    settings.FileName = "VehicleExpenses.db3";
+                    settings.Tables.Add<Expense>();
+                    settings.Tables.Add<FuelRecord>();
+                    settings.Tables.Add<Vehicle>();
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
-            // Services
-            builder.Services.AddSingleton<DatabaseService>();
 
             // ViewModels
             builder.Services.AddTransient<HomeViewModel>();

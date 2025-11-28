@@ -1,36 +1,33 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GMYEL8.FelevesFeladat.Models;
-using GMYEL8.FelevesFeladat.Services;
+using GMYEL8.FelevesFeladat.Domain.Entities;
+using GMYEL8.FelevesFeladat.Shared.Repositories;
 using System.Collections.ObjectModel;
 
 namespace GMYEL8.FelevesFeladat.ViewModels
 {
-    public partial class ExpensesViewModel : ObservableObject
+    public partial class ExpensesViewModel(IRepository<Expense> repository) : ObservableObject
     {
-        private readonly DatabaseService _databaseService;
+        private readonly IRepository<Expense> _repository = repository;
 
         [ObservableProperty]
-        private ObservableCollection<Expense> _expenses = new();
+        private ObservableCollection<Expense> _expenses = [];
 
         [ObservableProperty]
         private int _currentVehicleId;
-
-        public ExpensesViewModel(DatabaseService databaseService)
-        {
-            _databaseService = databaseService;
-        }
 
         [RelayCommand]
         private async Task LoadExpensesAsync()
         {
             try
             {
-                var vehicles = await _databaseService.GetVehiclesAsync();
+                var vehicles = await _repository.Table.ToListAsync();
                 if (vehicles.Count > 0)
                 {
                     CurrentVehicleId = vehicles[0].Id;
-                    var expensesList = await _databaseService.GetExpensesAsync(CurrentVehicleId);
+                    var expensesList = await _repository.Table
+                        .Where(exp => exp.VehicleId == CurrentVehicleId)
+                        .ToListAsync();
                     Expenses = new ObservableCollection<Expense>(expensesList);
                 }
             }
@@ -60,7 +57,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
 
             if (answer)
             {
-                await _databaseService.DeleteExpenseAsync(expense);
+                await _repository.DeleteAsync(expense);
                 Expenses.Remove(expense);
             }
         }
