@@ -23,7 +23,7 @@ public class DatabaseRegistration
     {
         return new DatabaseSettings
         {
-            FilePath = FileSystem.AppDataDirectory,
+            FilePath = FileSystem.Current.AppDataDirectory,
             FileName = null,
             OpenFlags = SQLite.SQLiteOpenFlags.ReadWrite | SQLite.SQLiteOpenFlags.Create,
         };
