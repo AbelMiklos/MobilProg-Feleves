@@ -88,7 +88,6 @@ public partial class EditVehicleViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveAsync()
     {
-        // Validáció
         if (string.IsNullOrWhiteSpace(Name))
         {
             await Shell.Current.DisplayAlertAsync("Hiba", "A jármű nevét kötelező megadni!", "OK");

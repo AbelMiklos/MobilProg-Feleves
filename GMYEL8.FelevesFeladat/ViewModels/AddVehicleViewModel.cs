@@ -39,7 +39,6 @@ public partial class AddVehicleViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveAsync()
     {
-        // Validáció
         if (string.IsNullOrWhiteSpace(Name))
         {
             await Shell.Current.DisplayAlertAsync("Hiba", "A jármű nevét kötelező megadni!", "OK");
@@ -52,9 +51,10 @@ public partial class AddVehicleViewModel : ObservableObject
             return;
         }
 
-        if (Year < 1900 || Year > DateTime.Now.Year + 1)
+        const int minYear = 1900;
+        if (Year < minYear || Year > DateTime.Now.Year + 1)
         {
-            await Shell.Current.DisplayAlertAsync("Hiba", $"Az évjárat nem lehet kisebb 1900-nál és nem lehet nagyobb {DateTime.Now.Year + 1}-nél!", "OK");
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Az évjárat nem lehet kisebb {minYear}-nál és nem lehet nagyobb {DateTime.Now.Year + 1}-nél!", "OK");
             return;
         }
 

@@ -65,7 +65,6 @@ public partial class AddExpenseViewModel : ObservableObject
             };
 
             await _expenseRepository.InsertAsync(expense);
-            await Shell.Current.DisplayAlertAsync("Siker", "Költség sikeresen rögzítve!", "OK");
             await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
