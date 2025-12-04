@@ -1,10 +1,20 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+Ôªøusing CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GMYEL8.FelevesFeladat.Domain.Entities;
+using GMYEL8.FelevesFeladat.Domain.Enums;
 using GMYEL8.FelevesFeladat.Shared.Repositories;
+using System.Collections.ObjectModel;
 
 namespace GMYEL8.FelevesFeladat.ViewModels;
 
+public class ExpenseGroupModel
+{
+    public ExpenseType Type { get; set; }
+    public double TotalCost { get; set; }
+    public int Count { get; set; }
+}
+
+[QueryProperty(nameof(VehicleId), nameof(VehicleId))]
 public partial class StatisticsViewModel(
     IRepository<Vehicle> vehicleRepository,
     IRepository<FuelRecord> fuelRecordRepository,
@@ -13,6 +23,12 @@ public partial class StatisticsViewModel(
     private readonly IRepository<Vehicle> _vehicleRepository = vehicleRepository;
     private readonly IRepository<FuelRecord> _fuelRecordRepository = fuelRecordRepository;
     private readonly IRepository<Expense> _expenseRepository = expenseRepository;
+
+    [ObservableProperty]
+    private int _currentVehicleId;
+
+    [ObservableProperty]
+    private Vehicle? _currentVehicle;
 
     [ObservableProperty]
     private double _averageConsumption;
@@ -27,49 +43,99 @@ public partial class StatisticsViewModel(
     private double _totalCost;
 
     [ObservableProperty]
-    private string _statisticsInfo = "Statisztik·k betˆltÈse...";
+    private int _fuelRecordCount;
+
+    [ObservableProperty]
+    private int _expenseCount;
+
+    [ObservableProperty]
+    private bool _hasExpenseGroups;
+
+    [ObservableProperty]
+    private ObservableCollection<ExpenseGroupModel> _expenseGroups = [];
+
+    [ObservableProperty]
+    private string _statisticsInfo = "Statisztik√°k bet√∂lt√©se...";
+
+    public string VehicleId
+    {
+        set
+        {
+            if (int.TryParse(value, out int vehicleId))
+            {
+                CurrentVehicleId = vehicleId;
+                _ = LoadStatisticsAsync();
+            }
+        }
+    }
 
     [RelayCommand]
     private async Task LoadStatisticsAsync()
     {
         try
         {
-            var vehicles = await _vehicleRepository.Table.ToListAsync();
-            if (vehicles.Count > 0)
+            if (CurrentVehicleId <= 0)
             {
-                var vehicleId = vehicles[0].Id;
-                var fuelRecords = await _fuelRecordRepository.Table
-                    .Where(fuel => fuel.VehicleId == vehicleId)
-                    .ToListAsync();
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Nincs kiv√°lasztva j√°rm≈±!", "OK");
+                await Shell.Current.GoToAsync("..");
+                return;
+            }
 
-                var expenses = await _expenseRepository.Table
-                    .Where(exp => exp.VehicleId == vehicleId)
-                    .ToListAsync();
+            CurrentVehicle = await _vehicleRepository.Table
+                    .Where(v => v.Id == CurrentVehicleId)
+                    .FirstOrDefaultAsync();
 
-                if (fuelRecords.Count > 0)
-                {
-                    AverageConsumption = fuelRecords.Average(f => f.AverageConsumption);
-                    TotalFuelCost = fuelRecords.Sum(f => f.TotalCost);
-                }
+            var fuelRecords = await _fuelRecordRepository.Table
+                .Where(fuel => fuel.VehicleId == CurrentVehicleId)
+                .ToListAsync();
 
-                TotalExpenses = expenses.Sum(e => e.Cost);
-                TotalCost = TotalFuelCost + TotalExpenses;
+            var expenses = await _expenseRepository.Table
+                .Where(exp => exp.VehicleId == CurrentVehicleId)
+                .ToListAsync();
 
-                StatisticsInfo = $"Tankol·sok sz·ma: {fuelRecords.Count}\n" +
-                               $"KˆltsÈgek sz·ma: {expenses.Count}\n" +
-                               $"¡tlagfogyaszt·s: {AverageConsumption:F2} L/100km\n" +
-                               $"÷sszes ¸zemanyag kˆltsÈg: {TotalFuelCost:F0} Ft\n" +
-                               $"÷sszes egyÈb kˆltsÈg: {TotalExpenses:F0} Ft\n" +
-                               $"Teljes kˆltsÈg: {TotalCost:F0} Ft";
+            FuelRecordCount = fuelRecords.Count;
+            ExpenseCount = expenses.Count;
+
+            if (fuelRecords.Count > 0)
+            {
+                AverageConsumption = fuelRecords.Average(f => f.AverageConsumption);
+                TotalFuelCost = fuelRecords.Sum(f => f.TotalCost);
             }
             else
             {
-                StatisticsInfo = "Nincs mÈg j·rm˚ rˆgzÌtve.";
+                AverageConsumption = 0;
+                TotalFuelCost = 0;
             }
+
+            TotalExpenses = expenses.Sum(e => e.Cost);
+            TotalCost = TotalFuelCost + TotalExpenses;
+
+            var expenseGroupsList = expenses
+                .GroupBy(e => e.Type)
+                .Select(g => new ExpenseGroupModel
+                {
+                    Type = g.Key,
+                    TotalCost = g.Sum(e => e.Cost),
+                    Count = g.Count()
+                })
+                .Where(g => g.TotalCost > 0)
+                .OrderByDescending(g => g.TotalCost)
+                .ToList();
+
+            ExpenseGroups = new ObservableCollection<ExpenseGroupModel>(expenseGroupsList);
+            HasExpenseGroups = ExpenseGroups.Count > 0;
+
+            StatisticsInfo = $"J√°rm≈±: {CurrentVehicle.Name} - {CurrentVehicle.LicensePlate}\n" +
+                           $"Tankol√°sok sz√°ma: {FuelRecordCount}\n" +
+                           $"Egy√©b kiad√°sok sz√°ma: {ExpenseCount}\n" +
+                           $"√Åtlagfogyaszt√°s: {AverageConsumption:F2} L/100km\n" +
+                           $"√ñsszes √ºzemanyag k√∂lts√©g: {TotalFuelCost:F0} Ft\n" +
+                           $"√ñsszes egy√©b kiad√°si k√∂lts√©g: {TotalExpenses:F0} Ft\n" +
+                           $"Teljes k√∂lts√©g: {TotalCost:F0} Ft";
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlertAsync("Hiba", $"Statisztik·k betˆltÈse sikertelen: {ex.Message}", "OK");
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Statisztik√°k bet√∂lt√©se sikertelen: {ex.Message}", "OK");
         }
     }
 }
