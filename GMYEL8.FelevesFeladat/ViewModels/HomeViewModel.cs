@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GMYEL8.FelevesFeladat.Domain.Entities;
 using GMYEL8.FelevesFeladat.Shared.Repositories;
@@ -59,7 +59,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Adatok bet�lt�se sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Adatok betöltése sikertelen: {ex.Message}", "OK");
             }
         }
 
@@ -74,16 +74,67 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         {
             if (SelectedVehicle == null)
             {
-                await Shell.Current.DisplayAlertAsync("Hiba", "V�lassz ki egy j�rm�vet a szerkeszt�shez!", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", "Válassz ki egy járművet a szerkesztéshez!", "OK");
                 return;
             }
 
             var navigationParameter = new ShellNavigationQueryParameters()
             {
-                { "VehicleId", SelectedVehicle.Id }
+                { "VehicleId", SelectedVehicle.Id.ToString() }
             };
 
             await Shell.Current.GoToAsync(EditVehiclePage.ROUTE, navigationParameter);
+        }
+
+        [RelayCommand]
+        private async Task NavigateToFuelRecordsAsync()
+        {
+            if (SelectedVehicle == null)
+            {
+                await Shell.Current.DisplayAlertAsync("Hiba", "Válassz ki egy járművet!", "OK");
+                return;
+            }
+
+            var navigationParameter = new ShellNavigationQueryParameters()
+            {
+                { "VehicleId", SelectedVehicle.Id.ToString() }
+            };
+
+            await Shell.Current.GoToAsync(FuelRecordsPage.ROUTE, navigationParameter);
+        }
+
+        [RelayCommand]
+        private async Task NavigateToExpensesAsync()
+        {
+            if (SelectedVehicle == null)
+            {
+                await Shell.Current.DisplayAlertAsync("Hiba", "Válassz ki egy járművet!", "OK");
+                return;
+            }
+
+            var navigationParameter = new ShellNavigationQueryParameters()
+            {
+                { "VehicleId", SelectedVehicle.Id.ToString() }
+            };
+
+            await Shell.Current.GoToAsync(ExpensesPage.ROUTE, navigationParameter);
+        }
+
+        [RelayCommand]
+        private async Task NavigateToStatisticsAsync()
+        {
+            if (SelectedVehicle == null)
+            {
+                await Shell.Current.DisplayAlertAsync("Hiba", "Válassz ki egy járművet!", "OK");
+                return;
+            }
+
+            var navigationParameter = new ShellNavigationQueryParameters()
+            {
+                { "VehicleId", SelectedVehicle.Id.ToString() }
+            };
+
+            await Shell.Current.GoToAsync(StatisticsPage.ROUTE, navigationParameter);
         }
 
         private async Task LoadVehicleStatisticsAsync()
@@ -128,7 +179,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Statisztik�k bet�lt�se sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Statisztikák betöltése sikertelen: {ex.Message}", "OK");
             }
         }
     }
