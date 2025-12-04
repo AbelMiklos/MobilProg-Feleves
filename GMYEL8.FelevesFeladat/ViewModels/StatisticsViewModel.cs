@@ -127,11 +127,7 @@ public partial class StatisticsViewModel(
 
             StatisticsInfo = $"Jármű: {CurrentVehicle.Name} - {CurrentVehicle.LicensePlate}\n" +
                            $"Tankolások száma: {FuelRecordCount}\n" +
-                           $"Egyéb kiadások száma: {ExpenseCount}\n" +
-                           $"Átlagfogyasztás: {AverageConsumption:F2} L/100km\n" +
-                           $"Összes üzemanyag költség: {TotalFuelCost:F0} Ft\n" +
-                           $"Összes egyéb kiadási költség: {TotalExpenses:F0} Ft\n" +
-                           $"Teljes költség: {TotalCost:F0} Ft";
+                           $"Egyéb kiadások száma: {ExpenseCount}\n";
         }
         catch (Exception ex)
         {

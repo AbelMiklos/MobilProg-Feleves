@@ -121,7 +121,6 @@ public partial class EditVehicleViewModel : ObservableObject
                 vehicle.Year = Year;
 
                 await _vehicleRepository.UpdateAsync(vehicle);
-                await Shell.Current.DisplayAlertAsync("Siker", "Jármű sikeresen módosítva!", "OK");
                 await Shell.Current.GoToAsync("..");
             }
             else
@@ -156,7 +155,6 @@ public partial class EditVehicleViewModel : ObservableObject
             if (vehicle != null)
             {
                 await _vehicleRepository.DeleteAsync(vehicle);
-                await Shell.Current.DisplayAlertAsync("Siker", "Jármű sikeresen törölve!", "OK");
                 await Shell.Current.GoToAsync("..");
             }
         }

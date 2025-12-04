@@ -66,7 +66,6 @@
                 </Grid>
             </Border>
 
-            <!-- Jármű információ - csak kiválasztott jármű esetén -->
             <Border Grid.Row="1"
                     Stroke="LightGray"
                     StrokeThickness="1"
@@ -106,7 +105,6 @@
                 </Grid>
             </Border>
 
-            <!-- Statisztikák - csak kiválasztott jármű esetén -->
             <Border Grid.Row="2"
                     Stroke="LightGray"
                     StrokeThickness="1"

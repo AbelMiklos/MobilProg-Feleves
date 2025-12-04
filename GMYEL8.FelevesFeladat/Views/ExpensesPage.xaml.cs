@@ -11,5 +11,15 @@ namespace GMYEL8.FelevesFeladat.Views
             InitializeComponent();
             BindingContext = viewModel;
         }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            
+            if (BindingContext is ExpensesViewModel viewModel)
+            {
+                viewModel.LoadExpensesCommand.Execute(null);
+            }
+        }
     }
 }

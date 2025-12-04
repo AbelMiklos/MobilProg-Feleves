@@ -40,8 +40,11 @@ namespace GMYEL8.FelevesFeladat
             builder.Services.AddTransient<EditVehicleViewModel>();
             builder.Services.AddTransient<FuelRecordsViewModel>();
             builder.Services.AddTransient<AddFuelViewModel>();
+            builder.Services.AddTransient<AddExpenseViewModel>();
+            builder.Services.AddTransient<EditExpenseViewModel>();
             builder.Services.AddTransient<ExpensesViewModel>();
             builder.Services.AddTransient<StatisticsViewModel>();
+            builder.Services.AddTransient<EditFuelViewModel>();
 
             // Views
             builder.Services.AddTransient<HomePage>();
@@ -49,8 +52,11 @@ namespace GMYEL8.FelevesFeladat
             builder.Services.AddTransient<EditVehiclePage>();
             builder.Services.AddTransient<FuelRecordsPage>();
             builder.Services.AddTransient<AddFuelPage>();
+            builder.Services.AddTransient<AddExpensePage>();
+            builder.Services.AddTransient<EditExpensePage>();
             builder.Services.AddTransient<ExpensesPage>();
             builder.Services.AddTransient<StatisticsPage>();
+            builder.Services.AddTransient<EditFuelPage>();
 
             return builder.Build();
         }

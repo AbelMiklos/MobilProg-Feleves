@@ -56,6 +56,11 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                 {
                     SelectedVehicle = null;
                 }
+
+                if (SelectedVehicle == null && vehicles.Count == 1)
+                {
+                    SelectedVehicle = vehicles[0];
+                }
             }
             catch (Exception ex)
             {

@@ -4,72 +4,92 @@ using GMYEL8.FelevesFeladat.Domain.Entities;
 using GMYEL8.FelevesFeladat.Shared.Repositories;
 using System.Collections.ObjectModel;
 
-namespace GMYEL8.FelevesFeladat.ViewModels
+namespace GMYEL8.FelevesFeladat.ViewModels;
+
+[QueryProperty(nameof(VehicleId), nameof(VehicleId))]
+public partial class FuelRecordsViewModel(IRepository<FuelRecord> repository) : ObservableObject
 {
-    public partial class FuelRecordsViewModel(IRepository<FuelRecord> repository) : ObservableObject
+    private readonly IRepository<FuelRecord> _repository = repository;
+
+    [ObservableProperty]
+    private ObservableCollection<FuelRecord> _fuelRecords = [];
+
+    [ObservableProperty]
+    private int _currentVehicleId;
+
+    public string VehicleId
     {
-        private readonly IRepository<FuelRecord> _repository = repository;
-
-        [ObservableProperty]
-        private ObservableCollection<FuelRecord> _fuelRecords = new();
-
-        [ObservableProperty]
-        private int _currentVehicleId;
-
-        [RelayCommand]
-        private async Task LoadFuelRecordsAsync()
+        set
         {
-            try
+            if (int.TryParse(value, out int vehicleId))
             {
-                // Alapértelmezetten az elsõ jármû adatait töltjük be
-                var vehicles = await _repository.Table
+                CurrentVehicleId = vehicleId;
+                _ = LoadFuelRecordsAsync();
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task LoadFuelRecordsAsync()
+    {
+        try
+        {
+            if (CurrentVehicleId > 0)
+            {
+                var records = await _repository.Table
+                    .Where(fr => fr.VehicleId == CurrentVehicleId)
+                    .OrderByDescending(fr => fr.Date)
                     .ToListAsync();
-                if (vehicles.Count > 0)
-                {
-                    CurrentVehicleId = vehicles[0].Id;
-                    var records = await _repository.Table
-                        .Where(fr => fr.VehicleId == CurrentVehicleId)
-                        .ToListAsync();
 
-                    FuelRecords = new ObservableCollection<FuelRecord>(records);
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Betöltés sikertelen: {ex.Message}", "OK");
+                FuelRecords = new ObservableCollection<FuelRecord>(records);
             }
         }
-
-        [RelayCommand]
-        private async Task AddFuelRecordAsync()
+        catch (Exception ex)
         {
-            await Shell.Current.GoToAsync("AddFuelPage");
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Betöltés sikertelen: {ex.Message}", "OK");
         }
+    }
 
-        [RelayCommand]
-        private async Task EditFuelRecordAsync(FuelRecord fuelRecord)
+    [RelayCommand]
+    private async Task AddFuelRecordAsync()
+    {
+        var navigationParameter = new ShellNavigationQueryParameters()
         {
-            if (fuelRecord == null) return;
+            { "VehicleId", CurrentVehicleId }
+        };
+        
+        await Shell.Current.GoToAsync("AddFuelPage", navigationParameter);
+    }
 
-            await Shell.Current.GoToAsync($"AddFuelPage?id={fuelRecord.Id}");
-        }
+    [RelayCommand]
+    private async Task EditFuelRecordAsync(FuelRecord fuelRecord)
+    {
+        if (fuelRecord == null)
+            return;
 
-        [RelayCommand]
-        private async Task DeleteFuelRecordAsync(FuelRecord fuelRecord)
+        var navigationParameter = new ShellNavigationQueryParameters()
         {
-            if (fuelRecord == null) return;
+            { "FuelRecordId", fuelRecord.Id.ToString() }
+        };
 
-            bool answer = await Shell.Current.DisplayAlertAsync(
-                "Törlés megerõsítése",
-                $"Biztosan törölni szeretnéd ezt a tankolást?",
-                "Igen",
-                "Nem");
+        await Shell.Current.GoToAsync("EditFuelPage", navigationParameter);
+    }
 
-            if (answer)
-            {
-                await _repository.DeleteAsync(fuelRecord);
-                FuelRecords.Remove(fuelRecord);
-            }
+    [RelayCommand]
+    private async Task DeleteFuelRecordAsync(FuelRecord fuelRecord)
+    {
+        if (fuelRecord == null) return;
+
+        bool answer = await Shell.Current.DisplayAlertAsync(
+            "Törlés megerõsítése",
+            $"Biztosan törölni szeretnéd ezt a tankolást?",
+            "Igen",
+            "Nem");
+
+        if (answer)
+        {
+            await _repository.DeleteAsync(fuelRecord);
+            FuelRecords.Remove(fuelRecord);
         }
     }
 }

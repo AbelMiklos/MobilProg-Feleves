@@ -2,10 +2,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GMYEL8.FelevesFeladat.Domain.Entities;
 using GMYEL8.FelevesFeladat.Shared.Repositories;
+using GMYEL8.FelevesFeladat.Views;
 using System.Collections.ObjectModel;
 
 namespace GMYEL8.FelevesFeladat.ViewModels
 {
+    [QueryProperty(nameof(VehicleId), nameof(VehicleId))]
     public partial class ExpensesViewModel(IRepository<Expense> repository) : ObservableObject
     {
         private readonly IRepository<Expense> _repository = repository;
@@ -16,18 +18,30 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         [ObservableProperty]
         private int _currentVehicleId;
 
+        public string VehicleId
+        {
+            set
+            {
+                if (int.TryParse(value, out int vehicleId))
+                {
+                    CurrentVehicleId = vehicleId;
+                    _ = LoadExpensesAsync();
+                }
+            }
+        }
+
         [RelayCommand]
         private async Task LoadExpensesAsync()
         {
             try
             {
-                var vehicles = await _repository.Table.ToListAsync();
-                if (vehicles.Count > 0)
+                if (CurrentVehicleId > 0)
                 {
-                    CurrentVehicleId = vehicles[0].Id;
                     var expensesList = await _repository.Table
                         .Where(exp => exp.VehicleId == CurrentVehicleId)
+                        .OrderByDescending(exp => exp.Date)
                         .ToListAsync();
+                    
                     Expenses = new ObservableCollection<Expense>(expensesList);
                 }
             }
@@ -40,8 +54,25 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         [RelayCommand]
         private async Task AddExpenseAsync()
         {
-            // TODO: Navigate to AddExpensePage
-            await Shell.Current.DisplayAlertAsync("Info", "Új költség hozzáadása - hamarosan!", "OK");
+            var navigationParameter = new ShellNavigationQueryParameters()
+            {
+                { "VehicleId", CurrentVehicleId.ToString() }
+            };
+
+            await Shell.Current.GoToAsync(AddExpensePage.ROUTE, navigationParameter);
+        }
+
+        [RelayCommand]
+        private async Task EditExpenseAsync(Expense expense)
+        {
+            if (expense == null) return;
+
+            var navigationParameter = new ShellNavigationQueryParameters()
+            {
+                { "ExpenseId", expense.Id.ToString() }
+            };
+
+            await Shell.Current.GoToAsync(EditExpensePage.ROUTE, navigationParameter);
         }
 
         [RelayCommand]

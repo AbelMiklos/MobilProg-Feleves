@@ -5,14 +5,23 @@ using GMYEL8.FelevesFeladat.Shared.Repositories;
 
 namespace GMYEL8.FelevesFeladat.ViewModels
 {
-    [QueryProperty(nameof(VehicleId), nameof(VehicleId))]
-    public partial class AddFuelViewModel(IRepository<FuelRecord> fuelRecordRepository, IRepository<Vehicle> vehicleRepository) : ObservableObject
+    [QueryProperty(nameof(FuelRecordId), nameof(FuelRecordId))]
+    public partial class EditFuelViewModel(IRepository<FuelRecord> fuelRecordRepository) : ObservableObject
     {
         private readonly IRepository<FuelRecord> _fuelRecordRepository = fuelRecordRepository;
-        private readonly IRepository<Vehicle> _vehicleRepository = vehicleRepository;
+        private int _fuelRecordId;
 
-        [ObservableProperty]
-        private int _vehicleId;
+        public string FuelRecordId
+        {
+            set
+            {
+                if (int.TryParse(value, out int fuelId))
+                {
+                    _fuelRecordId = fuelId;
+                    LoadFuelRecordAsync();
+                }
+            }
+        }
 
         [ObservableProperty]
         private DateTime _date = DateTime.Now;
@@ -38,41 +47,131 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         [ObservableProperty]
         private string? _locationAddress;
 
+        [ObservableProperty]
+        private bool _isLoading;
+
+        private async void LoadFuelRecordAsync()
+        {
+            if (_fuelRecordId <= 0)
+                return;
+
+            try
+            {
+                IsLoading = true;
+                var record = await _fuelRecordRepository.Table
+                    .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
+
+                if (record != null)
+                {
+                    Date = record.Date;
+                    Distance = record.Distance.ToString();
+                    FuelAmount = record.FuelAmount.ToString();
+                    PricePerLitre = record.PricePerLitre.ToString();
+                    ReceiptPhotoPath = record.ReceiptPhotoPath;
+                    Latitude = record.Latitude;
+                    Longitude = record.Longitude;
+
+                    // Ha van GPS koordináta, próbáljuk meg lekérdezni a címet
+                    if (Latitude.HasValue && Longitude.HasValue)
+                    {
+                        try
+                        {
+                            var placemarks = await Geocoding.Default.GetPlacemarksAsync(Latitude.Value, Longitude.Value);
+                            var placemark = placemarks?.FirstOrDefault();
+
+                            if (placemark != null)
+                            {
+                                LocationAddress = $"{placemark.Thoroughfare} {placemark.SubThoroughfare}, {placemark.Locality}";
+                            }
+                            else
+                            {
+                                LocationAddress = $"{Latitude:F6}, {Longitude:F6}";
+                            }
+                        }
+                        catch
+                        {
+                            LocationAddress = $"{Latitude:F6}, {Longitude:F6}";
+                        }
+                    }
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlertAsync("Hiba", "A tankolási rekord nem található!", "OK");
+                    await Shell.Current.GoToAsync("..");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Tankolási rekord betöltése sikertelen: {ex.Message}", "OK");
+                await Shell.Current.GoToAsync("..");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
         [RelayCommand]
         private async Task SaveAsync()
         {
+            if (!ValidateInputs())
+                return;
+
             try
             {
-                if (!ValidateInputs())
-                    return;
+                var record = await _fuelRecordRepository.Table
+                    .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
 
-                var vehicle = await _vehicleRepository.Table
-                    .FirstOrDefaultAsync(v => v.Id == VehicleId);
-
-                if (vehicle == null)
+                if (record != null)
                 {
-                    await Shell.Current.DisplayAlertAsync("Hiba", "Nincs jármû kiválasztva!", "OK");
-                    return;
+                    record.Date = Date;
+                    record.Distance = double.Parse(Distance);
+                    record.FuelAmount = double.Parse(FuelAmount);
+                    record.PricePerLitre = double.Parse(PricePerLitre);
+                    record.ReceiptPhotoPath = ReceiptPhotoPath;
+                    record.Latitude = Latitude;
+                    record.Longitude = Longitude;
+
+                    await _fuelRecordRepository.UpdateAsync(record);
+                    await Shell.Current.GoToAsync("..");
                 }
-
-                var fuelRecord = new FuelRecord
+                else
                 {
-                    VehicleId = vehicle.Id,
-                    Date = Date,
-                    Distance = double.Parse(Distance),
-                    FuelAmount = double.Parse(FuelAmount),
-                    PricePerLitre = double.Parse(PricePerLitre),
-                    ReceiptPhotoPath = ReceiptPhotoPath,
-                    Latitude = Latitude,
-                    Longitude = Longitude
-                };
-
-                await _fuelRecordRepository.InsertAsync(fuelRecord);
-                await Shell.Current.GoToAsync("..");
+                    await Shell.Current.DisplayAlertAsync("Hiba", "A tankolási rekord nem található!", "OK");
+                }
             }
             catch (Exception ex)
             {
                 await Shell.Current.DisplayAlertAsync("Hiba", $"Mentés sikertelen: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task DeleteAsync()
+        {
+            bool confirm = await Shell.Current.DisplayAlertAsync(
+                "Megerõsítés",
+                "Biztosan törölni szeretnéd ezt a tankolási rekordot?",
+                "Igen",
+                "Nem");
+
+            if (!confirm)
+                return;
+
+            try
+            {
+                var record = await _fuelRecordRepository.Table
+                    .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
+
+                if (record != null)
+                {
+                    await _fuelRecordRepository.DeleteAsync(record);
+                    await Shell.Current.GoToAsync("..");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Törlés sikertelen: {ex.Message}", "OK");
             }
         }
 
@@ -117,10 +216,10 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                 {
                     Latitude = location.Latitude;
                     Longitude = location.Longitude;
-                    
+
                     var placemarks = await Geocoding.Default.GetPlacemarksAsync(location.Latitude, location.Longitude);
                     var placemark = placemarks?.FirstOrDefault();
-                    
+
                     if (placemark != null)
                     {
                         LocationAddress = $"{placemark.Thoroughfare} {placemark.SubThoroughfare}, {placemark.Locality}";

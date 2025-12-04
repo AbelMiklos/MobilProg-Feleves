@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:GMYEL8.FelevesFeladat.ViewModels"
+             x:Class="GMYEL8.FelevesFeladat.Views.EditExpensePage"
+             x:DataType="viewmodel:EditExpenseViewModel"
+             Title="Kiadás szerkesztése">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Loading indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                             IsVisible="{Binding IsLoading}"
+                             Color="{StaticResource Primary}"
+                             HeightRequest="50"
+                             VerticalOptions="Center"/>
+
+            <VerticalStackLayout IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
+
+                <!-- Dátum -->
+                <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Dátum *"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <DatePicker Date="{Binding Date}"
+                                    Format="yyyy.MM.dd"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Típus -->
+                <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Típus *"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Picker ItemsSource="{Binding ExpenseTypes}"
+                                SelectedItem="{Binding SelectedExpenseType}"
+                                Title="Válassz típust">
+                            <Picker.ItemDisplayBinding>
+                                <Binding Converter="{StaticResource EnumToDescriptionConverter}" />
+                            </Picker.ItemDisplayBinding>
+                        </Picker>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Leírás -->
+                <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Leírás *"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Entry Text="{Binding Description}"
+                               Placeholder="pl. Olajcsere és szűrőcsere"
+                               MaxLength="500"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Költség -->
+                <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Költség (Ft) *"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Entry Text="{Binding Cost}"
+                               Keyboard="Numeric"
+                               Placeholder="pl. 25000"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Gombok -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
+                    <Button Grid.Column="0"
+                            Text="Mégse"
+                            Command="{Binding CancelCommand}"
+                            BackgroundColor="Gray"
+                            TextColor="White"/>
+
+                    <Button Grid.Column="1"
+                            Text="Mentés"
+                            Command="{Binding SaveCommand}"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"/>
+                </Grid>
+
+                <!-- Törlés gomb -->
+                <Button Text="🗑️ Költség törlése"
+                        Command="{Binding DeleteCommand}"
+                        BackgroundColor="Red"
+                        TextColor="White"
+                        Margin="0,10,0,0"/>
+
+                <Label Text="* Kötelező mezők"
+                       FontSize="12"
+                       TextColor="Gray"
+                       HorizontalOptions="Center"
+                       Margin="0,10,0,0"/>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
