@@ -10,7 +10,7 @@
         
         <Button Grid.Row="0"
                 Text="Uj koltseg"
-                Command="{Binding AddExpenseAsyncCommand}"
+                Command="{Binding AddExpenseCommand}"
                 BackgroundColor="{StaticResource Primary}"
                 TextColor="White"
                 Margin="10"/>
@@ -33,11 +33,12 @@
             
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Margin="5" 
-                           Padding="10" 
-                           BorderColor="LightGray"
-                           CornerRadius="8"
-                           HasShadow="True">
+                    <Border Margin="5" 
+                            Padding="10" 
+                            Stroke="LightGray"
+                            StrokeThickness="1"
+                            BackgroundColor="White"
+                            StrokeShape="RoundRectangle 8">
                         <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                             
                             <Label Grid.Row="0" Grid.Column="0"
@@ -69,7 +70,7 @@
                                     Padding="10,5"
                                     VerticalOptions="Center"/>
                         </Grid>
-                    </Frame>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

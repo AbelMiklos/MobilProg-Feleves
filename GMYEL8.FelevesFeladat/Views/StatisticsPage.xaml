@@ -4,23 +4,16 @@
              xmlns:viewmodel="clr-namespace:GMYEL8.FelevesFeladat.ViewModels"
              x:Class="GMYEL8.FelevesFeladat.Views.StatisticsPage"
              x:DataType="viewmodel:StatisticsViewModel"
-             Title="Statisztikak">
+             Title="Statisztikák">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
-            
-            <Label Text="Statisztikak"
-                   FontSize="24"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,20"/>
 
-            <Frame BorderColor="LightGray" 
-                   CornerRadius="10"
-                   Padding="15"
-                   HasShadow="True">
+            <Border Stroke="LightGray" 
+                    StrokeShape="RoundRectangle 10"
+                    Padding="15">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Osszesitett adatok"
+                    <Label Text="Összesített adatok"
                            FontSize="18"
                            FontAttributes="Bold"
                            Margin="0,0,0,10"/>
@@ -29,14 +22,13 @@
                            FontSize="14"
                            LineBreakMode="WordWrap"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <Frame BorderColor="LightGray" 
-                   CornerRadius="10"
-                   Padding="15"
-                   HasShadow="True">
+            <Border Stroke="LightGray" 
+                    StrokeShape="RoundRectangle 10"
+                    Padding="15">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Atlagfogyasztas"
+                    <Label Text="Átlagfogyasztás"
                            FontSize="18"
                            FontAttributes="Bold"/>
                     
@@ -45,44 +37,72 @@
                            HorizontalOptions="Center"
                            TextColor="{StaticResource Primary}"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <Frame BorderColor="LightGray" 
-                   CornerRadius="10"
-                   Padding="15"
-                   HasShadow="True">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Koltsegek"
+            <Border Stroke="LightGray" 
+                    StrokeShape="RoundRectangle 10"
+                    Padding="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Költségek"
                            FontSize="18"
                            FontAttributes="Bold"/>
-                    
-                    <Label Text="{Binding TotalFuelCost, StringFormat='Uzemanyag: {0:F0} Ft'}"
+
+                    <Label Text="{Binding TotalFuelCost, StringFormat='Üzemanyag: {0:F0} Ft'}"
                            FontSize="16"/>
-                    
-                    <Label Text="{Binding TotalExpenses, StringFormat='Egyeb: {0:F0} Ft'}"
+
+                    <Label Text="{Binding TotalExpenses, StringFormat='Összes egyéb kiadási költség: {0:F0} Ft'}"
                            FontSize="16"/>
-                    
+
+                    <VerticalStackLayout Spacing="1" Margin="0,10,0,0">
+                        <Label Text="Egyéb kiadások részletesen:"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="Gray"
+                               IsVisible="{Binding HasExpenseGroups}"/>
+
+                        <Label Text="Nincs egyéb kiadás"
+                               FontSize="14"
+                               TextColor="Gray"
+                               IsVisible="{Binding HasExpenseGroups, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                        <CollectionView ItemsSource="{Binding ExpenseGroups}"
+                                      SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodel:ExpenseGroupModel">
+                                    <Grid ColumnDefinitions="*,Auto" Padding="10,5">
+                                        <HorizontalStackLayout Grid.Column="0" Spacing="5">
+                                            <Label Text="•" 
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"/>
+                                            <Label Text="{Binding Type, Converter={StaticResource EnumToDescriptionConverter}}"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"/>
+                                            <Label Text="{Binding Count, StringFormat='({0} db)'}"
+                                                   FontSize="12"
+                                                   TextColor="Gray"
+                                                   VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+
+                                        <Label Grid.Column="1"
+                                               Text="{Binding TotalCost, StringFormat='{0:F0} Ft'}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+
                     <BoxView HeightRequest="1" Color="LightGray" Margin="0,5"/>
-                    
-                    <Label Text="{Binding TotalCost, StringFormat='Osszesen: {0:F0} Ft'}"
+
+                    <Label Text="{Binding TotalCost, StringFormat='Összesen: {0:F0} Ft'}"
                            FontSize="18"
                            FontAttributes="Bold"
                            TextColor="{StaticResource Primary}"
                            HorizontalOptions="Center"/>
                 </VerticalStackLayout>
-            </Frame>
-
-            <Label Text="Diagramok hamarosan!"
-                   FontSize="16"
-                   HorizontalOptions="Center"
-                   TextColor="Gray"
-                   Margin="0,20,0,0"/>
-
-            <Button Text="Frissites"
-                    Command="{Binding LoadStatisticsAsyncCommand}"
-                    BackgroundColor="{StaticResource Primary}"
-                    TextColor="White"
-                    Margin="0,10,0,0"/>
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

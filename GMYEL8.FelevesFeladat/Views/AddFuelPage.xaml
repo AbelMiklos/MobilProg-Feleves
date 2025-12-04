@@ -43,8 +43,8 @@
                            FontSize="18"
                            FontAttributes="Bold"/>
 
-                    <Button Text="Blokk foto keszitese"
-                            Command="{Binding TakePhotoAsyncCommand}"
+                    <Button Text="Blokk fotó készítése"
+                            Command="{Binding TakePhotoCommand}"
                             BackgroundColor="SeaGreen"
                             TextColor="White"/>
 
@@ -53,8 +53,8 @@
                            FontSize="12"
                            TextColor="Green"/>
 
-                    <Button Text="Helyzet mentese (GPS)"
-                            Command="{Binding GetLocationAsyncCommand}"
+                    <Button Text="Helyzet mentése (GPS)"
+                            Command="{Binding GetLocationCommand}"
                             BackgroundColor="DodgerBlue"
                             TextColor="White"/>
 
@@ -71,13 +71,13 @@
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
                 <Button Grid.Column="0"
                         Text="Mentes"
-                        Command="{Binding SaveAsyncCommand}"
+                        Command="{Binding SaveCommand}"
                         BackgroundColor="{StaticResource Primary}"
                         TextColor="White"/>
 
                 <Button Grid.Column="1"
                         Text="Megse"
-                        Command="{Binding CancelAsyncCommand}"
+                        Command="{Binding CancelCommand}"
                         BackgroundColor="Gray"
                         TextColor="White"/>
             </Grid>
