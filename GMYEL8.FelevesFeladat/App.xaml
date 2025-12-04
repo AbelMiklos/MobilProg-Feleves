@@ -13,6 +13,8 @@
             
             <!-- Converters -->
             <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <converters:EnumToDescriptionConverter x:Key="EnumToDescriptionConverter" />
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

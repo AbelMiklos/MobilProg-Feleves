@@ -1,15 +1,15 @@
 ﻿using GMYEL8.FelevesFeladat.Views;
 
-namespace GMYEL8.FelevesFeladat
+namespace GMYEL8.FelevesFeladat;
+
+public partial class AppShell : Shell
 {
-    public partial class AppShell : Shell
+    public AppShell()
     {
-        public AppShell()
-        {
-            InitializeComponent();
-            
-            // Register routes for navigation
-            Routing.RegisterRoute("AddFuelPage", typeof(AddFuelPage));
-        }
+        InitializeComponent();
+        
+        Routing.RegisterRoute(AddFuelPage.ROUTE, typeof(AddFuelPage));
+        Routing.RegisterRoute(AddVehiclePage.ROUTE, typeof(AddVehiclePage));
+        Routing.RegisterRoute(EditVehiclePage.ROUTE, typeof(EditVehiclePage));
     }
 }

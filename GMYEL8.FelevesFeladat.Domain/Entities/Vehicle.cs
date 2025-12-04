@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using GMYEL8.FelevesFeladat.Domain.Enums;
+using SQLite;
 
 namespace GMYEL8.FelevesFeladat.Domain.Entities;
 
@@ -11,9 +12,7 @@ public class Vehicle
     [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
 
-    [MaxLength(50)]
-    // TODO: Use enum
-    public string Type { get; set; } = string.Empty; // Car, Motorcycle, etc.
+    public VehicleType Type { get; set; }
 
     [MaxLength(20)]
     public string LicensePlate { get; set; } = string.Empty;

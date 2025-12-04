@@ -24,15 +24,20 @@ namespace GMYEL8.FelevesFeladat
                     settings.Tables.Add<Expense>();
                     settings.Tables.Add<FuelRecord>();
                     settings.Tables.Add<Vehicle>();
+#if DEBUG
+                }, seedData: true);
+#else
                 });
+#endif
 
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
 
-
             // ViewModels
-            builder.Services.AddTransient<HomeViewModel>();
+            builder.Services.AddTransient<HomePageViewModel>();
+            builder.Services.AddTransient<AddVehicleViewModel>();
+            builder.Services.AddTransient<EditVehicleViewModel>();
             builder.Services.AddTransient<FuelRecordsViewModel>();
             builder.Services.AddTransient<AddFuelViewModel>();
             builder.Services.AddTransient<ExpensesViewModel>();
@@ -40,6 +45,8 @@ namespace GMYEL8.FelevesFeladat
 
             // Views
             builder.Services.AddTransient<HomePage>();
+            builder.Services.AddTransient<AddVehiclePage>();
+            builder.Services.AddTransient<EditVehiclePage>();
             builder.Services.AddTransient<FuelRecordsPage>();
             builder.Services.AddTransient<AddFuelPage>();
             builder.Services.AddTransient<ExpensesPage>();

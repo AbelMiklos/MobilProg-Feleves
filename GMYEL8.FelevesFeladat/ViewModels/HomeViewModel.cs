@@ -2,10 +2,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GMYEL8.FelevesFeladat.Domain.Entities;
 using GMYEL8.FelevesFeladat.Shared.Repositories;
+using GMYEL8.FelevesFeladat.Views;
+using System.Collections.ObjectModel;
 
 namespace GMYEL8.FelevesFeladat.ViewModels
 {
-    public partial class HomeViewModel(
+    public partial class HomePageViewModel(
         IRepository<Vehicle> vehicleRepository,
         IRepository<FuelRecord> fuelRecordRepository,
         IRepository<Expense> expenseRepository) : ObservableObject
@@ -15,7 +17,10 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         private readonly IRepository<Expense> _expenseRepository = expenseRepository;
 
         [ObservableProperty]
-        private Vehicle? _currentVehicle;
+        private ObservableCollection<Vehicle> _vehicles = [];
+
+        [ObservableProperty]
+        private Vehicle? _selectedVehicle;
 
         [ObservableProperty]
         private double _averageConsumption;
@@ -27,7 +32,17 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         private FuelRecord? _lastFuelRecord;
 
         [ObservableProperty]
-        private string _welcomeMessage = "Válassz egy jármûvet";
+        private bool _isVehicleSelected;
+
+        async partial void OnSelectedVehicleChanged(Vehicle? value)
+        {
+            IsVehicleSelected = value != null;
+            
+            if (IsVehicleSelected)
+            {
+                await LoadVehicleStatisticsAsync();
+            }
+        }
 
         [RelayCommand]
         private async Task LoadDataAsync()
@@ -35,47 +50,86 @@ namespace GMYEL8.FelevesFeladat.ViewModels
             try
             {
                 var vehicles = await _vehicleRepository.Table.ToListAsync();
-                if (vehicles.Count > 0)
+                Vehicles = new ObservableCollection<Vehicle>(vehicles);
+
+                if (SelectedVehicle != null && !vehicles.Any(v => v.Id == SelectedVehicle.Id))
                 {
-                    CurrentVehicle = vehicles[0]; // Elsõ jármû betöltése
-                    await LoadVehicleStatisticsAsync();
+                    SelectedVehicle = null;
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Hiba", $"Adatok betöltése sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Adatok betöltése sikertelen: {ex.Message}", "OK");
             }
+        }
+
+        [RelayCommand]
+        private async Task AddVehicleAsync()
+        {
+            await Shell.Current.GoToAsync(AddVehiclePage.ROUTE);
+        }
+
+        [RelayCommand]
+        private async Task EditVehicleAsync()
+        {
+            if (SelectedVehicle == null)
+            {
+                await Shell.Current.DisplayAlertAsync("Hiba", "Válassz ki egy jármûvet a szerkesztéshez!", "OK");
+                return;
+            }
+
+            var navigationParameter = new ShellNavigationQueryParameters()
+            {
+                { "VehicleId", SelectedVehicle.Id }
+            };
+
+            await Shell.Current.GoToAsync(EditVehiclePage.ROUTE, navigationParameter);
         }
 
         private async Task LoadVehicleStatisticsAsync()
         {
-            if (CurrentVehicle == null) return;
+            if (SelectedVehicle == null)
+                return;
 
-            var fuelRecords = await _fuelRecordRepository.Table
-                .Where(fuel => fuel.VehicleId == CurrentVehicle.Id)
-                .ToListAsync();
-            var expenses = await _expenseRepository.Table.Where(exp => exp.VehicleId == CurrentVehicle.Id).ToListAsync();
-
-            if (fuelRecords.Count > 0)
+            try
             {
-                LastFuelRecord = fuelRecords[0];
-                AverageConsumption = fuelRecords.Average(f => f.AverageConsumption);
+                var fuelRecords = await _fuelRecordRepository.Table
+                    .Where(fuel => fuel.VehicleId == SelectedVehicle.Id)
+                    .OrderByDescending(f => f.Date)
+                    .ToListAsync();
+                
+                var expenses = await _expenseRepository.Table
+                    .Where(exp => exp.VehicleId == SelectedVehicle.Id)
+                    .ToListAsync();
+
+                if (fuelRecords.Count > 0)
+                {
+                    LastFuelRecord = fuelRecords[0];
+                    AverageConsumption = fuelRecords.Average(f => f.AverageConsumption);
+                }
+                else
+                {
+                    LastFuelRecord = null;
+                    AverageConsumption = 0;
+                }
+
+                int currentMonth = DateTime.Now.Month;
+                int currentYear = DateTime.Now.Year;
+
+                double monthlyFuelCost = fuelRecords
+                    .Where(f => f.Date.Month == currentMonth && f.Date.Year == currentYear)
+                    .Sum(f => f.TotalCost);
+
+                double monthlyExpenseCost = expenses
+                    .Where(e => e.Date.Month == currentMonth && e.Date.Year == currentYear)
+                    .Sum(e => e.Cost);
+
+                MonthlyCost = monthlyFuelCost + monthlyExpenseCost;
             }
-
-            var currentMonth = DateTime.Now.Month;
-            var currentYear = DateTime.Now.Year;
-
-            var monthlyFuelCost = fuelRecords
-                .Where(f => f.Date.Month == currentMonth && f.Date.Year == currentYear)
-                .Sum(f => f.TotalCost);
-
-            var monthlyExpenseCost = expenses
-                .Where(e => e.Date.Month == currentMonth && e.Date.Year == currentYear)
-                .Sum(e => e.Cost);
-
-            MonthlyCost = monthlyFuelCost + monthlyExpenseCost;
-
-            WelcomeMessage = $"Üdv! Aktuális jármû: {CurrentVehicle.Name}";
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Statisztikák betöltése sikertelen: {ex.Message}", "OK");
+            }
         }
     }
 }

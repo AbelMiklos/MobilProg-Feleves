@@ -69,7 +69,7 @@ public partial class StatisticsViewModel(
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Hiba", $"Statisztikák betöltése sikertelen: {ex.Message}", "OK");
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Statisztikák betöltése sikertelen: {ex.Message}", "OK");
         }
     }
 }

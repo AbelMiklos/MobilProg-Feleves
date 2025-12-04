@@ -4,7 +4,7 @@ namespace GMYEL8.FelevesFeladat.Views
 {
     public partial class HomePage : ContentPage
     {
-        public HomePage(HomeViewModel viewModel)
+        public HomePage(HomePageViewModel viewModel)
         {
             InitializeComponent();
             BindingContext = viewModel;
@@ -13,7 +13,7 @@ namespace GMYEL8.FelevesFeladat.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            if (BindingContext is HomeViewModel viewModel)
+            if (BindingContext is HomePageViewModel viewModel)
             {
                 viewModel.LoadDataCommand.Execute(null);
             }

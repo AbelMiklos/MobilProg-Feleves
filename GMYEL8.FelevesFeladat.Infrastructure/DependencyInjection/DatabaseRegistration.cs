@@ -24,7 +24,7 @@ public class DatabaseRegistration
         return new DatabaseSettings
         {
             FilePath = FileSystem.Current.AppDataDirectory,
-            FileName = null,
+            FileName = string.Empty,
             OpenFlags = SQLite.SQLiteOpenFlags.ReadWrite | SQLite.SQLiteOpenFlags.Create,
         };
     }

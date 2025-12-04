@@ -21,5 +21,4 @@ namespace GMYEL8.FelevesFeladat.WinUI
 
         protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     }
-
 }

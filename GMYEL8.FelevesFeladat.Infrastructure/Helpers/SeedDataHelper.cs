@@ -1,8 +1,8 @@
-using GMYEL8.FelevesFeladat.Domain.Entities;
+ï»¿using GMYEL8.FelevesFeladat.Domain.Entities;
 using GMYEL8.FelevesFeladat.Domain.Enums;
 using GMYEL8.FelevesFeladat.Shared.Services;
 
-namespace GMYEL8.FelevesFeladat.Helpers;
+namespace GMYEL8.FelevesFeladat.Infrastructure.Helpers;
 
 public static class SeedDataHelper
 {
@@ -19,8 +19,8 @@ public static class SeedDataHelper
         // Add sample vehicle
         var vehicle = new Vehicle
         {
-            Name = "Saját autó",
-            Type = "Személyautó",
+            Name = "SajÃ¡t autÃ³",
+            Type = VehicleType.Car,
             LicensePlate = "ABC-123",
             Year = 2020
         };
@@ -70,7 +70,7 @@ public static class SeedDataHelper
             {
                 VehicleId = vehicleId,
                 Type = ExpenseType.Maintenance,
-                Description = "Olajcsere és szûrõcsere",
+                Description = "Olajcsere Ã©s szÅ±rÅ‘csere",
                 Cost = 25000,
                 Date = DateTime.Now.AddDays(-20)
             },
@@ -78,7 +78,7 @@ public static class SeedDataHelper
             {
                 VehicleId = vehicleId,
                 Type = ExpenseType.Insurance,
-                Description = "Éves kötelezõ biztosítás",
+                Description = "Ã‰ves kÃ¶telezÅ‘ biztosÃ­tÃ¡s",
                 Cost = 45000,
                 Date = DateTime.Now.AddDays(-60)
             }
@@ -90,3 +90,4 @@ public static class SeedDataHelper
         }
     }
 }
+

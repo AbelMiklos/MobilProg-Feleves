@@ -33,7 +33,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Hiba", $"Betöltés sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Betöltés sikertelen: {ex.Message}", "OK");
             }
         }
 
@@ -41,7 +41,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         private async Task AddExpenseAsync()
         {
             // TODO: Navigate to AddExpensePage
-            await Shell.Current.DisplayAlert("Info", "Új költség hozzáadása - hamarosan!", "OK");
+            await Shell.Current.DisplayAlertAsync("Info", "Új költség hozzáadása - hamarosan!", "OK");
         }
 
         [RelayCommand]
@@ -49,7 +49,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         {
             if (expense == null) return;
 
-            bool answer = await Shell.Current.DisplayAlert(
+            bool answer = await Shell.Current.DisplayAlertAsync(
                 "Törlés megerõsítése",
                 $"Biztosan törölni szeretnéd ezt a költséget?",
                 "Igen",
