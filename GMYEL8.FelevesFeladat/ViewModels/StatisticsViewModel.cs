@@ -34,6 +34,12 @@ public partial class StatisticsViewModel(
     private double _averageConsumption;
 
     [ObservableProperty]
+    private double _averageFuelPricePerLitre;
+
+    [ObservableProperty]
+    private double _averageMonthlyFuelCost;
+
+    [ObservableProperty]
     private double _totalFuelCost;
 
     [ObservableProperty]
@@ -100,11 +106,41 @@ public partial class StatisticsViewModel(
             {
                 AverageConsumption = fuelRecords.Average(f => f.AverageConsumption);
                 TotalFuelCost = fuelRecords.Sum(f => f.TotalCost);
+                
+                // Átlagos literenkénti ár kiszámítása
+                AverageFuelPricePerLitre = fuelRecords.Average(f => f.PricePerLitre);
+                
+                // Átlagos havi üzemanyag költség kiszámítása
+                if (fuelRecords.Count > 1)
+                {
+                    var oldestRecord = fuelRecords.Min(f => f.Date);
+                    var newestRecord = fuelRecords.Max(f => f.Date);
+                    var monthsDiff = ((newestRecord.Year - oldestRecord.Year) * 12) + 
+                                    newestRecord.Month - oldestRecord.Month;
+                    
+                    // Ha legalább 1 hónap eltelt
+                    if (monthsDiff > 0)
+                    {
+                        AverageMonthlyFuelCost = TotalFuelCost / monthsDiff;
+                    }
+                    else
+                    {
+                        // Ha még nem telt el egy hónap, akkor az eddigi összes költség
+                        AverageMonthlyFuelCost = TotalFuelCost;
+                    }
+                }
+                else
+                {
+                    // Ha csak egy tankolás van
+                    AverageMonthlyFuelCost = TotalFuelCost;
+                }
             }
             else
             {
                 AverageConsumption = 0;
                 TotalFuelCost = 0;
+                AverageFuelPricePerLitre = 0;
+                AverageMonthlyFuelCost = 0;
             }
 
             TotalExpenses = expenses.Sum(e => e.Cost);
