@@ -150,7 +150,6 @@ public partial class EditFuelViewModel : ObservableObject
                 record.Longitude = Longitude;
 
                 await _fuelRecordRepository.UpdateAsync(record);
-                await Shell.Current.DisplayAlertAsync("Siker", "Tankolás sikeresen módosítva!", "OK");
                 await Shell.Current.GoToAsync("..");
             }
             else
@@ -184,7 +183,6 @@ public partial class EditFuelViewModel : ObservableObject
             if (record != null)
             {
                 await _fuelRecordRepository.DeleteAsync(record);
-                await Shell.Current.DisplayAlertAsync("Siker", "Tankolás sikeresen törölve!", "OK");
                 await Shell.Current.GoToAsync("..");
             }
         }
