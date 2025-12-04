@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodel="clr-namespace:GMYEL8.FelevesFeladat.ViewModels"
+             xmlns:entities="clr-namespace:GMYEL8.FelevesFeladat.Domain.Entities;assembly=GMYEL8.FelevesFeladat.Domain"
              x:Class="GMYEL8.FelevesFeladat.Views.FuelRecordsPage"
              x:DataType="viewmodel:FuelRecordsViewModel"
              x:Name="ThisPage"
@@ -12,7 +13,7 @@
         <Button Grid.Row="0"
                 Text="Új tankolás"
                 Command="{Binding AddFuelRecordCommand}"
-                BackgroundColor="{StaticResource Primary}"
+                BackgroundColor="Green"
                 TextColor="White"
                 Margin="10"/>
 
@@ -33,14 +34,14 @@
             </CollectionView.EmptyView>
             
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewmodel:FuelRecord">
+                <DataTemplate x:DataType="entities:FuelRecord">
                     <Border Margin="5" 
                             Padding="10" 
                             Stroke="LightGray">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
-                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                             
                             <Label Grid.Row="0" Grid.Column="0"
                                    Text="{Binding Date, StringFormat='{0:yyyy.MM.dd}'}"
@@ -48,9 +49,12 @@
                                    FontAttributes="Bold"/>
                             
                             <Label Grid.Row="1" Grid.Column="0"
-                                   Text="{Binding Distance, StringFormat='Távolság: {0} km'}"/>
+                                   Text="{Binding Type, Converter={StaticResource EnumToDescriptionConverter}, StringFormat='Típus: {0}'}"/>
                             
                             <Label Grid.Row="2" Grid.Column="0"
+                                   Text="{Binding Distance, StringFormat='Távolság: {0} km'}"/>
+                            
+                            <Label Grid.Row="3" Grid.Column="0"
                                    Text="{Binding FuelAmount, StringFormat='Mennyiség: {0} L'}"/>
                             
                             <Label Grid.Row="0" Grid.Column="1"
@@ -59,7 +63,7 @@
                                    FontAttributes="Bold"
                                    VerticalOptions="Center"/>
                             
-                            <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Grid.RowSpan="2"
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Grid.RowSpan="3"
                                                    VerticalOptions="Center"
                                                    Spacing="5">
                                 <Button Text="Részletek"
@@ -69,14 +73,6 @@
                                         TextColor="White"
                                         FontSize="12"
                                         Padding="10,5"/>
-                                
-                                <!--<Button Text="Törlés"
-                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeleteFuelRecordCommand}"
-                                        CommandParameter="{Binding .}"
-                                        BackgroundColor="Red"
-                                        TextColor="White"
-                                        FontSize="12"
-                                        Padding="10,5"/>-->
                             </HorizontalStackLayout>
                         </Grid>
                     </Border>

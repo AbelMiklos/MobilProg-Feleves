@@ -27,6 +27,15 @@
                 <DatePicker Date="{Binding Date}"
                             Format="yyyy.MM.dd"/>
 
+                <Label Text="Üzemanyag típusa"/>
+                <Picker ItemsSource="{Binding FuelTypes}"
+                        SelectedItem="{Binding SelectedFuelType}"
+                        Title="Válassz üzemanyag típust">
+                    <Picker.ItemDisplayBinding>
+                        <Binding Path="." Converter="{StaticResource EnumToDescriptionConverter}" />
+                    </Picker.ItemDisplayBinding>
+                </Picker>
+
                 <Label Text="Megtett távolság (km)"/>
                 <Entry Text="{Binding Distance}"
                        Keyboard="Numeric"
@@ -85,7 +94,7 @@
                     <Button Grid.Column="0"
                             Text="Mentés"
                             Command="{Binding SaveCommand}"
-                            BackgroundColor="{StaticResource Primary}"
+                            BackgroundColor="Green"
                             TextColor="White"/>
 
                     <Button Grid.Column="1"
@@ -95,7 +104,7 @@
                             TextColor="White"/>
                 </Grid>
 
-                <Button Text="Törlés"
+                <Button Text="🗑️ Törlés"
                         Command="{Binding DeleteCommand}"
                         BackgroundColor="Red"
                         TextColor="White"

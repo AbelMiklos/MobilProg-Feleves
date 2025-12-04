@@ -1,15 +1,27 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GMYEL8.FelevesFeladat.Domain.Entities;
+using GMYEL8.FelevesFeladat.Domain.Enums;
 using GMYEL8.FelevesFeladat.Shared.Repositories;
+using System.Collections.ObjectModel;
 
 namespace GMYEL8.FelevesFeladat.ViewModels
 {
     [QueryProperty(nameof(VehicleId), nameof(VehicleId))]
-    public partial class AddFuelViewModel(IRepository<FuelRecord> fuelRecordRepository, IRepository<Vehicle> vehicleRepository) : ObservableObject
+    public partial class AddFuelViewModel : ObservableObject
     {
-        private readonly IRepository<FuelRecord> _fuelRecordRepository = fuelRecordRepository;
-        private readonly IRepository<Vehicle> _vehicleRepository = vehicleRepository;
+        private readonly IRepository<FuelRecord> _fuelRecordRepository;
+        private readonly IRepository<Vehicle> _vehicleRepository;
+
+        public AddFuelViewModel(IRepository<FuelRecord> fuelRecordRepository, IRepository<Vehicle> vehicleRepository)
+        {
+            _fuelRecordRepository = fuelRecordRepository;
+            _vehicleRepository = vehicleRepository;
+            FuelTypes = new ObservableCollection<FuelType>(
+                Enum.GetValues<FuelType>().Cast<FuelType>()
+            );
+            SelectedFuelType = FuelType.Petrol;
+        }
 
         [ObservableProperty]
         private int _vehicleId;
@@ -25,6 +37,12 @@ namespace GMYEL8.FelevesFeladat.ViewModels
 
         [ObservableProperty]
         private string _pricePerLitre = string.Empty;
+
+        [ObservableProperty]
+        private FuelType _selectedFuelType;
+
+        [ObservableProperty]
+        private ObservableCollection<FuelType> _fuelTypes = [];
 
         [ObservableProperty]
         private string? _receiptPhotoPath;
@@ -60,6 +78,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                     VehicleId = vehicle.Id,
                     Date = Date,
                     Distance = double.Parse(Distance),
+                    Type = SelectedFuelType,
                     FuelAmount = double.Parse(FuelAmount),
                     PricePerLitre = double.Parse(PricePerLitre),
                     ReceiptPhotoPath = ReceiptPhotoPath,

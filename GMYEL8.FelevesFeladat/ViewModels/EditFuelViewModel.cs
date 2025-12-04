@@ -1,290 +1,308 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GMYEL8.FelevesFeladat.Domain.Entities;
+using GMYEL8.FelevesFeladat.Domain.Enums;
 using GMYEL8.FelevesFeladat.Shared.Repositories;
+using System.Collections.ObjectModel;
 
-namespace GMYEL8.FelevesFeladat.ViewModels
+namespace GMYEL8.FelevesFeladat.ViewModels;
+
+[QueryProperty(nameof(FuelRecordId), nameof(FuelRecordId))]
+public partial class EditFuelViewModel : ObservableObject
 {
-    [QueryProperty(nameof(FuelRecordId), nameof(FuelRecordId))]
-    public partial class EditFuelViewModel(IRepository<FuelRecord> fuelRecordRepository) : ObservableObject
-    {
-        private readonly IRepository<FuelRecord> _fuelRecordRepository = fuelRecordRepository;
-        private int _fuelRecordId;
+    private readonly IRepository<FuelRecord> _fuelRecordRepository;
+    private int _fuelRecordId;
 
-        public string FuelRecordId
+    public EditFuelViewModel(IRepository<FuelRecord> fuelRecordRepository)
+    {
+        _fuelRecordRepository = fuelRecordRepository;
+        FuelTypes = new ObservableCollection<FuelType>(
+            Enum.GetValues<FuelType>().Cast<FuelType>()
+        );
+    }
+
+    public string FuelRecordId
+    {
+        set
         {
-            set
+            if (int.TryParse(value, out int fuelId))
             {
-                if (int.TryParse(value, out int fuelId))
-                {
-                    _fuelRecordId = fuelId;
-                    LoadFuelRecordAsync();
-                }
+                _fuelRecordId = fuelId;
+                LoadFuelRecordAsync();
             }
         }
+    }
 
-        [ObservableProperty]
-        private DateTime _date = DateTime.Now;
+    [ObservableProperty]
+    private DateTime _date = DateTime.Now;
 
-        [ObservableProperty]
-        private string _distance = string.Empty;
+    [ObservableProperty]
+    private string _distance = string.Empty;
 
-        [ObservableProperty]
-        private string _fuelAmount = string.Empty;
+    [ObservableProperty]
+    private string _fuelAmount = string.Empty;
 
-        [ObservableProperty]
-        private string _pricePerLitre = string.Empty;
+    [ObservableProperty]
+    private string _pricePerLitre = string.Empty;
 
-        [ObservableProperty]
-        private string? _receiptPhotoPath;
+    [ObservableProperty]
+    private FuelType _selectedFuelType;
 
-        [ObservableProperty]
-        private double? _latitude;
+    [ObservableProperty]
+    private ObservableCollection<FuelType> _fuelTypes = [];
 
-        [ObservableProperty]
-        private double? _longitude;
+    [ObservableProperty]
+    private string? _receiptPhotoPath;
 
-        [ObservableProperty]
-        private string? _locationAddress;
+    [ObservableProperty]
+    private double? _latitude;
 
-        [ObservableProperty]
-        private bool _isLoading;
+    [ObservableProperty]
+    private double? _longitude;
 
-        private async void LoadFuelRecordAsync()
+    [ObservableProperty]
+    private string? _locationAddress;
+
+    [ObservableProperty]
+    private bool _isLoading;
+
+    private async void LoadFuelRecordAsync()
+    {
+        if (_fuelRecordId <= 0)
+            return;
+
+        try
         {
-            if (_fuelRecordId <= 0)
-                return;
+            IsLoading = true;
+            var record = await _fuelRecordRepository.Table
+                .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
 
-            try
+            if (record != null)
             {
-                IsLoading = true;
-                var record = await _fuelRecordRepository.Table
-                    .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
+                Date = record.Date;
+                Distance = record.Distance.ToString();
+                FuelAmount = record.FuelAmount.ToString();
+                PricePerLitre = record.PricePerLitre.ToString();
+                SelectedFuelType = record.Type;
+                ReceiptPhotoPath = record.ReceiptPhotoPath;
+                Latitude = record.Latitude;
+                Longitude = record.Longitude;
 
-                if (record != null)
+                if (Latitude.HasValue && Longitude.HasValue)
                 {
-                    Date = record.Date;
-                    Distance = record.Distance.ToString();
-                    FuelAmount = record.FuelAmount.ToString();
-                    PricePerLitre = record.PricePerLitre.ToString();
-                    ReceiptPhotoPath = record.ReceiptPhotoPath;
-                    Latitude = record.Latitude;
-                    Longitude = record.Longitude;
-
-                    // Ha van GPS koordináta, próbáljuk meg lekérdezni a címet
-                    if (Latitude.HasValue && Longitude.HasValue)
+                    try
                     {
-                        try
-                        {
-                            var placemarks = await Geocoding.Default.GetPlacemarksAsync(Latitude.Value, Longitude.Value);
-                            var placemark = placemarks?.FirstOrDefault();
+                        var placemarks = await Geocoding.Default.GetPlacemarksAsync(Latitude.Value, Longitude.Value);
+                        var placemark = placemarks?.FirstOrDefault();
 
-                            if (placemark != null)
-                            {
-                                LocationAddress = $"{placemark.Thoroughfare} {placemark.SubThoroughfare}, {placemark.Locality}";
-                            }
-                            else
-                            {
-                                LocationAddress = $"{Latitude:F6}, {Longitude:F6}";
-                            }
+                        if (placemark != null)
+                        {
+                            LocationAddress = $"{placemark.Thoroughfare} {placemark.SubThoroughfare}, {placemark.Locality}";
                         }
-                        catch
+                        else
                         {
                             LocationAddress = $"{Latitude:F6}, {Longitude:F6}";
                         }
                     }
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlertAsync("Hiba", "A tankolási rekord nem található!", "OK");
-                    await Shell.Current.GoToAsync("..");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Tankolási rekord betöltése sikertelen: {ex.Message}", "OK");
-                await Shell.Current.GoToAsync("..");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
-
-        [RelayCommand]
-        private async Task SaveAsync()
-        {
-            if (!ValidateInputs())
-                return;
-
-            try
-            {
-                var record = await _fuelRecordRepository.Table
-                    .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
-
-                if (record != null)
-                {
-                    record.Date = Date;
-                    record.Distance = double.Parse(Distance);
-                    record.FuelAmount = double.Parse(FuelAmount);
-                    record.PricePerLitre = double.Parse(PricePerLitre);
-                    record.ReceiptPhotoPath = ReceiptPhotoPath;
-                    record.Latitude = Latitude;
-                    record.Longitude = Longitude;
-
-                    await _fuelRecordRepository.UpdateAsync(record);
-                    await Shell.Current.GoToAsync("..");
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlertAsync("Hiba", "A tankolási rekord nem található!", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Mentés sikertelen: {ex.Message}", "OK");
-            }
-        }
-
-        [RelayCommand]
-        private async Task DeleteAsync()
-        {
-            bool confirm = await Shell.Current.DisplayAlertAsync(
-                "Megerõsítés",
-                "Biztosan törölni szeretnéd ezt a tankolási rekordot?",
-                "Igen",
-                "Nem");
-
-            if (!confirm)
-                return;
-
-            try
-            {
-                var record = await _fuelRecordRepository.Table
-                    .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
-
-                if (record != null)
-                {
-                    await _fuelRecordRepository.DeleteAsync(record);
-                    await Shell.Current.GoToAsync("..");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Törlés sikertelen: {ex.Message}", "OK");
-            }
-        }
-
-        [RelayCommand]
-        private async Task TakePhotoAsync()
-        {
-            try
-            {
-                if (MediaPicker.Default.IsCaptureSupported)
-                {
-                    var photo = await MediaPicker.Default.CapturePhotoAsync();
-                    if (photo != null)
-                    {
-                        string newFilePath = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
-                        using (var stream = await photo.OpenReadAsync())
-                        using (var newStream = File.OpenWrite(newFilePath))
-                        {
-                            await stream.CopyToAsync(newStream);
-                        }
-                        ReceiptPhotoPath = newFilePath;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Fotó készítése sikertelen: {ex.Message}", "OK");
-            }
-        }
-
-        [RelayCommand]
-        private async Task GetLocationAsync()
-        {
-            try
-            {
-                var location = await Geolocation.Default.GetLocationAsync(new GeolocationRequest
-                {
-                    DesiredAccuracy = GeolocationAccuracy.Best,
-                    Timeout = TimeSpan.FromSeconds(15)
-                });
-
-                if (location != null)
-                {
-                    Latitude = location.Latitude;
-                    Longitude = location.Longitude;
-
-                    var placemarks = await Geocoding.Default.GetPlacemarksAsync(location.Latitude, location.Longitude);
-                    var placemark = placemarks?.FirstOrDefault();
-
-                    if (placemark != null)
-                    {
-                        LocationAddress = $"{placemark.Thoroughfare} {placemark.SubThoroughfare}, {placemark.Locality}";
-                    }
-                    else
+                    catch
                     {
                         LocationAddress = $"{Latitude:F6}, {Longitude:F6}";
                     }
                 }
             }
-            catch (Exception ex)
+            else
             {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Helymeghatározás sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", "A tankolási rekord nem található!", "OK");
+                await Shell.Current.GoToAsync("..");
             }
         }
-
-        [RelayCommand]
-        private async Task OpenMapAsync()
+        catch (Exception ex)
         {
-            try
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Tankolási rekord betöltése sikertelen: {ex.Message}", "OK");
+            await Shell.Current.GoToAsync("..");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SaveAsync()
+    {
+        if (!ValidateInputs())
+            return;
+
+        try
+        {
+            var record = await _fuelRecordRepository.Table
+                .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
+
+            if (record != null)
             {
-                if (Latitude.HasValue && Longitude.HasValue)
+                record.Date = Date;
+                record.Distance = double.Parse(Distance);
+                record.FuelAmount = double.Parse(FuelAmount);
+                record.PricePerLitre = double.Parse(PricePerLitre);
+                record.Type = SelectedFuelType;
+                record.ReceiptPhotoPath = ReceiptPhotoPath;
+                record.Latitude = Latitude;
+                record.Longitude = Longitude;
+
+                await _fuelRecordRepository.UpdateAsync(record);
+                await Shell.Current.DisplayAlertAsync("Siker", "Tankolás sikeresen módosítva!", "OK");
+                await Shell.Current.GoToAsync("..");
+            }
+            else
+            {
+                await Shell.Current.DisplayAlertAsync("Hiba", "A tankolási rekord nem található!", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Mentés sikertelen: {ex.Message}", "OK");
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteAsync()
+    {
+        bool confirm = await Shell.Current.DisplayAlertAsync(
+            "Megerõsítés",
+            "Biztosan törölni szeretnéd ezt a tankolási rekordot?",
+            "Igen",
+            "Nem");
+
+        if (!confirm)
+            return;
+
+        try
+        {
+            var record = await _fuelRecordRepository.Table
+                .FirstOrDefaultAsync(fuel => fuel.Id == _fuelRecordId);
+
+            if (record != null)
+            {
+                await _fuelRecordRepository.DeleteAsync(record);
+                await Shell.Current.DisplayAlertAsync("Siker", "Tankolás sikeresen törölve!", "OK");
+                await Shell.Current.GoToAsync("..");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Törlés sikertelen: {ex.Message}", "OK");
+        }
+    }
+
+    [RelayCommand]
+    private async Task TakePhotoAsync()
+    {
+        try
+        {
+            if (MediaPicker.Default.IsCaptureSupported)
+            {
+                var photo = await MediaPicker.Default.CapturePhotoAsync();
+                if (photo != null)
                 {
-                    var location = new Location(Latitude.Value, Longitude.Value);
-                    var options = new MapLaunchOptions { Name = LocationAddress ?? "Tankolás helyszíne" };
-                    await Map.Default.OpenAsync(location, options);
+                    string newFilePath = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
+                    using (var stream = await photo.OpenReadAsync())
+                    using (var newStream = File.OpenWrite(newFilePath))
+                    {
+                        await stream.CopyToAsync(newStream);
+                    }
+                    ReceiptPhotoPath = newFilePath;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Fotó készítése sikertelen: {ex.Message}", "OK");
+        }
+    }
+
+    [RelayCommand]
+    private async Task GetLocationAsync()
+    {
+        try
+        {
+            var location = await Geolocation.Default.GetLocationAsync(new GeolocationRequest
+            {
+                DesiredAccuracy = GeolocationAccuracy.Best,
+                Timeout = TimeSpan.FromSeconds(15)
+            });
+
+            if (location != null)
+            {
+                Latitude = location.Latitude;
+                Longitude = location.Longitude;
+
+                var placemarks = await Geocoding.Default.GetPlacemarksAsync(location.Latitude, location.Longitude);
+                var placemark = placemarks?.FirstOrDefault();
+
+                if (placemark != null)
+                {
+                    LocationAddress = $"{placemark.Thoroughfare} {placemark.SubThoroughfare}, {placemark.Locality}";
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlertAsync("Hiba", "Nincs mentett helyszín!", "OK");
+                    LocationAddress = $"{Latitude:F6}, {Longitude:F6}";
                 }
             }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Térkép megnyitása sikertelen: {ex.Message}", "OK");
-            }
         }
-
-        [RelayCommand]
-        private async Task CancelAsync()
+        catch (Exception ex)
         {
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Helymeghatározás sikertelen: {ex.Message}", "OK");
         }
+    }
 
-        private bool ValidateInputs()
+    [RelayCommand]
+    private async Task OpenMapAsync()
+    {
+        try
         {
-            if (string.IsNullOrWhiteSpace(Distance) || !double.TryParse(Distance, out _))
+            if (Latitude.HasValue && Longitude.HasValue)
             {
-                Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes kilométert!", "OK");
-                return false;
+                var location = new Location(Latitude.Value, Longitude.Value);
+                var options = new MapLaunchOptions { Name = LocationAddress ?? "Tankolás helyszíne" };
+                await Map.Default.OpenAsync(location, options);
             }
-
-            if (string.IsNullOrWhiteSpace(FuelAmount) || !double.TryParse(FuelAmount, out _))
+            else
             {
-                Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes üzemanyag mennyiséget!", "OK");
-                return false;
+                await Shell.Current.DisplayAlertAsync("Hiba", "Nincs mentett helyszín!", "OK");
             }
-
-            if (string.IsNullOrWhiteSpace(PricePerLitre) || !double.TryParse(PricePerLitre, out _))
-            {
-                Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes árat!", "OK");
-                return false;
-            }
-
-            return true;
         }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlertAsync("Hiba", $"Térkép megnyitása sikertelen: {ex.Message}", "OK");
+        }
+    }
+
+    [RelayCommand]
+    private async Task CancelAsync()
+    {
+        await Shell.Current.GoToAsync("..");
+    }
+
+    private bool ValidateInputs()
+    {
+        if (string.IsNullOrWhiteSpace(Distance) || !double.TryParse(Distance, out _))
+        {
+            Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes kilométert!", "OK");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(FuelAmount) || !double.TryParse(FuelAmount, out _))
+        {
+            Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes üzemanyag mennyiséget!", "OK");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(PricePerLitre) || !double.TryParse(PricePerLitre, out _))
+        {
+            Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes árat!", "OK");
+            return false;
+        }
+
+        return true;
     }
 }
