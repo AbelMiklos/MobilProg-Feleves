@@ -12,7 +12,7 @@
         <Button Grid.Row="0"
                 Text="Új kiadás"
                 Command="{Binding AddExpenseCommand}"
-                BackgroundColor="{StaticResource Primary}"
+                BackgroundColor="Green"
                 TextColor="White"
                 Margin="10"/>
 
@@ -71,14 +71,6 @@
                                         TextColor="White"
                                         FontSize="12"
                                         Padding="10,5"/>
-                                
-                                <!--<Button Text="Törlés"
-                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeleteExpenseCommand}"
-                                        CommandParameter="{Binding .}"
-                                        BackgroundColor="Red"
-                                        TextColor="White"
-                                        FontSize="12"
-                                        Padding="10,5"/>-->
                             </HorizontalStackLayout>
                         </Grid>
                     </Border>

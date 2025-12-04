@@ -9,13 +9,12 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
-            <Label Text="Új jármű hozzáadása"
+            <Label Text="Add meg a jármű adatait"
                    FontSize="24"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
                    Margin="0,20,0,30"/>
 
-            <!-- Jármű név -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     Padding="15">
@@ -32,7 +31,6 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Jármű típusa -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     Padding="15">
@@ -53,7 +51,6 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Rendszám -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     Padding="15">
@@ -70,7 +67,6 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Évjárat -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     Padding="15">
@@ -87,18 +83,17 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Gombok -->
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
                 <Button Grid.Column="0"
-                        Text="Mégse"
-                        Command="{Binding CancelAsyncCommand}"
-                        BackgroundColor="Gray"
+                        Text="Mentés"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="Green"
                         TextColor="White"/>
 
                 <Button Grid.Column="1"
-                        Text="Mentés"
-                        Command="{Binding SaveCommand}"
-                        BackgroundColor="{StaticResource Primary}"
+                        Text="Mégse"
+                        Command="{Binding CancelAsyncCommand}"
+                        BackgroundColor="Gray"
                         TextColor="White"/>
             </Grid>
 

@@ -9,13 +9,12 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
-            <Label Text="Új kiadás hozzáadása"
+            <Label Text="Kiadás részletei"
                    FontSize="24"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
                    Margin="0,0,0,20"/>
 
-            <!-- Dátum -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     Padding="15">
@@ -31,7 +30,6 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Típus -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     Padding="15">
@@ -52,7 +50,6 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Leírás -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     Padding="15">
@@ -69,7 +66,6 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Költség -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     Padding="15">
@@ -86,18 +82,17 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Gombok -->
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
                 <Button Grid.Column="0"
+                    Text="Mentés"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="Green"
+                    TextColor="White"/>
+                
+                <Button Grid.Column="1"
                         Text="Mégse"
                         Command="{Binding CancelCommand}"
                         BackgroundColor="Gray"
-                        TextColor="White"/>
-
-                <Button Grid.Column="1"
-                        Text="Mentés"
-                        Command="{Binding SaveCommand}"
-                        BackgroundColor="{StaticResource Primary}"
                         TextColor="White"/>
             </Grid>
 

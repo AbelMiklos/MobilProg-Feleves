@@ -15,7 +15,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Jármű kiválasztása -->
             <Border Grid.Row="0"
                     Stroke="LightGray"
                     StrokeThickness="1"
@@ -54,7 +53,7 @@
                     <Button Grid.Row="2"
                             Text="+ Új jármű hozzáadása"
                             Command="{Binding AddVehicleCommand}"
-                            BackgroundColor="{StaticResource Primary}"
+                            BackgroundColor="Green"
                             TextColor="White"/>
 
                     <Button Grid.Row="3"
