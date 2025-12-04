@@ -28,7 +28,6 @@ public class FuelRecord
     [Ignore]
     public double AverageConsumption => Distance > 0 ? (FuelAmount / Distance) * 100 : 0;
 
-    // GPS koordináták (extra funkció)
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
 
