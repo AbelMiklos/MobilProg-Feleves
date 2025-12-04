@@ -5,13 +5,17 @@ using GMYEL8.FelevesFeladat.Shared.Repositories;
 
 namespace GMYEL8.FelevesFeladat.ViewModels
 {
-    [QueryProperty(nameof(FuelRecordId), "id")]
-    public partial class AddFuelViewModel(IRepository<FuelRecord> repository) : ObservableObject
+    [QueryProperty(nameof(VehicleId), nameof(VehicleId))]
+    public partial class AddFuelViewModel(IRepository<FuelRecord> fuelRecordRepository, IRepository<Vehicle> vehicleRepository) : ObservableObject
     {
-        private readonly IRepository<FuelRecord> _repository = repository;
+        private readonly IRepository<FuelRecord> _fuelRecordRepository = fuelRecordRepository;
+        private readonly IRepository<Vehicle> _vehicleRepository = vehicleRepository;
 
         [ObservableProperty]
         private int _fuelRecordId;
+
+        [ObservableProperty]
+        private int _vehicleId;
 
         [ObservableProperty]
         private DateTime _date = DateTime.Now;
@@ -48,7 +52,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
 
         private async void LoadFuelRecordAsync(int id)
         {
-            var record = await _repository.Table.FirstOrDefaultAsync(fuel => fuel.Id == id);
+            var record = await _fuelRecordRepository.Table.FirstOrDefaultAsync(fuel => fuel.Id == id);
             if (record != null)
             {
                 Date = record.Date;
@@ -69,17 +73,19 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                 if (!ValidateInputs())
                     return;
 
-                var vehicles = await _repository.Table.ToListAsync();
-                if (vehicles.Count == 0)
+                var vehicle = await _vehicleRepository.Table
+                    .FirstOrDefaultAsync(v => v.Id == VehicleId);
+
+                if (vehicle == null)
                 {
-                    await Shell.Current.DisplayAlertAsync("Hiba", "Nincs jármû megadva!", "OK");
+                    await Shell.Current.DisplayAlertAsync("Hiba", "Nincs jármû kiválasztva!", "OK");
                     return;
                 }
 
                 var fuelRecord = new FuelRecord
                 {
                     Id = FuelRecordId,
-                    VehicleId = vehicles[0].Id, // Elsõ jármû használata
+                    VehicleId = vehicle.Id,
                     Date = Date,
                     Distance = double.Parse(Distance),
                     FuelAmount = double.Parse(FuelAmount),
@@ -89,7 +95,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                     Longitude = Longitude
                 };
 
-                await _repository.InsertAsync(fuelRecord);
+                await _fuelRecordRepository.InsertAsync(fuelRecord);
                 await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)
@@ -108,13 +114,13 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                     var photo = await MediaPicker.Default.CapturePhotoAsync();
                     if (photo != null)
                     {
-                        var newFile = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
+                        string newFilePath = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
                         using (var stream = await photo.OpenReadAsync())
-                        using (var newStream = File.OpenWrite(newFile))
+                        using (var newStream = File.OpenWrite(newFilePath))
                         {
                             await stream.CopyToAsync(newStream);
                         }
-                        ReceiptPhotoPath = newFile;
+                        ReceiptPhotoPath = newFilePath;
                     }
                 }
             }
@@ -131,8 +137,8 @@ namespace GMYEL8.FelevesFeladat.ViewModels
             {
                 var location = await Geolocation.Default.GetLocationAsync(new GeolocationRequest
                 {
-                    DesiredAccuracy = GeolocationAccuracy.Medium,
-                    Timeout = TimeSpan.FromSeconds(30)
+                    DesiredAccuracy = GeolocationAccuracy.Best,
+                    Timeout = TimeSpan.FromSeconds(15)
                 });
 
                 if (location != null)
