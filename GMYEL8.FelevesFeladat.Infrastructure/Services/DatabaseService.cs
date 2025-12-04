@@ -9,9 +9,7 @@ public class DatabaseService : IDatabaseService
 {
     private readonly IDatabaseSettings _settings;
 
-    private SQLiteAsyncConnection _connection;
-
-    public SQLiteAsyncConnection Connection => _connection;
+    public SQLiteAsyncConnection Connection { get; private set; }
 
     public DatabaseService(IDatabaseSettings settigns)
     {
@@ -25,16 +23,16 @@ public class DatabaseService : IDatabaseService
 
     public async Task Init()
     {
-        if (_connection is not null)
+        if (Connection is not null)
         {
             return;
         }
 
-        _connection = new SQLiteAsyncConnection(_settings.FullName(), _settings.OpenFlags);
+        Connection = new SQLiteAsyncConnection(_settings.FullName(), _settings.OpenFlags);
 
         foreach (var table in _settings.Tables)
         {
-            await _connection.CreateTableAsync(table);
+            await Connection.CreateTableAsync(table);
         }
     }
 }

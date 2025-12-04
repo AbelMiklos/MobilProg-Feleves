@@ -7,19 +7,17 @@ namespace GMYEL8.FelevesFeladat.Infrastructure.Repositories;
 public class DefaultRepository<T> : IRepository<T>
     where T : class, new()
 {
-    private readonly IDatabaseService _dbService;
-
     public DefaultRepository(IDatabaseService dbService)
     {
-        _dbService = dbService;
-        _dbService.Init().Wait();
+        DbService = dbService;
+        DbService.Init().Wait();
     }
 
-    public IDatabaseService DbService => _dbService;
+    public IDatabaseService DbService { get; }
 
-    public AsyncTableQuery<T> Table => _dbService.Connection.Table<T>();
+    public AsyncTableQuery<T> Table => DbService.Connection.Table<T>();
 
-    public async Task<int> DeleteAsync(T item) => await _dbService.Connection.DeleteAsync(item);
-    public async Task<int> InsertAsync(T item) => await _dbService.Connection.InsertAsync(item);
-    public async Task<int> UpdateAsync(T item) => await _dbService.Connection.UpdateAsync(item);
+    public async Task<int> DeleteAsync(T item) => await DbService.Connection.DeleteAsync(item);
+    public async Task<int> InsertAsync(T item) => await DbService.Connection.InsertAsync(item);
+    public async Task<int> UpdateAsync(T item) => await DbService.Connection.UpdateAsync(item);
 }

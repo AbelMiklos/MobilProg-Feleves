@@ -8,15 +8,13 @@ namespace GMYEL8.FelevesFeladat.Infrastructure.DependencyInjection;
 
 public class DatabaseRegistration
 {
-    private readonly IDatabaseSettings _databaseSettings;
-
-    public IDatabaseSettings CurrentSettings => _databaseSettings;
+    public IDatabaseSettings CurrentSettings { get; }
 
     public DatabaseRegistration(Action<IDatabaseSettings> settingsDelegate)
     {
-        _databaseSettings = GetDefaultSettings();
+        CurrentSettings = GetDefaultSettings();
 
-        settingsDelegate?.Invoke(_databaseSettings);
+        settingsDelegate?.Invoke(CurrentSettings);
     }
 
     internal IDatabaseSettings GetDefaultSettings()
