@@ -22,8 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\GMYEL8.FelevesFeladat.Domain\GMYEL8.FelevesFeladat.Domain.csproj" />
-	  <ProjectReference Include="..\GMYEL8.FelevesFeladat.Shared\GMYEL8.FelevesFeladat.Shared.csproj" />
+	  <ProjectReference Include="..\..\..\Shared\GMYEL8.FelevesFeladat.Domain\GMYEL8.FelevesFeladat.Domain.csproj" />
+	  <ProjectReference Include="..\..\..\Shared\GMYEL8.FelevesFeladat.Shared\GMYEL8.FelevesFeladat.Shared.csproj" />
 	</ItemGroup>
 
 </Project>
