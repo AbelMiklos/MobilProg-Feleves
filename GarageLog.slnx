@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="src/Shared/GarageLog.Domain/GarageLog.Domain.csproj" Id="5c54bab4-53ae-4433-b019-30cf12c444bc" />
+  <Project Path="src/Clients/Maui/GarageLog.LocalStorage/GarageLog.LocalStorage.csproj" Id="fab09d75-5bc3-4cd4-a9a4-2a508cdf56a9" />
+  <Project Path="src/Shared/GarageLog.Shared/GarageLog.Shared.csproj" Id="56b3c67b-36f7-47d0-b016-833152a5d3cd" />
+  <Project Path="src/Clients/Maui/GarageLog/GarageLog.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+</Solution>

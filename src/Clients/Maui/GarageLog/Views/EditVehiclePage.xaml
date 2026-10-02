@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:GarageLog.ViewModels"
+             x:Class="GarageLog.Views.EditVehiclePage"
+             x:DataType="viewmodel:EditVehicleViewModel"
+             Title="Jármű szerkesztése">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                             IsVisible="{Binding IsLoading}"
+                             Color="{StaticResource Primary}"
+                             HeightRequest="50"
+                             VerticalOptions="Center"/>
+
+            <VerticalStackLayout IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                               Spacing="15">
+                <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Jármű neve *"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Entry Text="{Binding Name}"
+                               Placeholder="pl. Saját autó"
+                               MaxLength="100"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Jármű típusa *"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Picker ItemsSource="{Binding VehicleTypes}"
+                                SelectedItem="{Binding SelectedVehicleType}"
+                                Title="Válassz típust">
+                            <Picker.ItemDisplayBinding>
+                                <Binding Converter="{StaticResource EnumToDescriptionConverter}" />
+                            </Picker.ItemDisplayBinding>
+                        </Picker>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Rendszám *"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Entry Text="{Binding LicensePlate}"
+                               Placeholder="pl. ABC-123"
+                               MaxLength="20"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Évjárat *"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Entry Text="{Binding Year}"
+                               Keyboard="Numeric"
+                               Placeholder="pl. 2020"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
+                    <Button Grid.Column="0"
+                        Text="Mentés"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="Green"
+                        TextColor="White"/>
+                    
+                    <Button Grid.Column="1"
+                            Text="Mégse"
+                            Command="{Binding CancelCommand}"
+                            BackgroundColor="Gray"
+                            TextColor="White"/>
+                </Grid>
+
+                <Button Text="🗑️ Jármű törlése"
+                        Command="{Binding DeleteCommand}"
+                        BackgroundColor="Red"
+                        TextColor="White"
+                        Margin="0,10,0,0"/>
+
+                <Label Text="* Kötelező mezők"
+                       FontSize="12"
+                       TextColor="Gray"
+                       HorizontalOptions="Center"
+                       Margin="0,10,0,0"/>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

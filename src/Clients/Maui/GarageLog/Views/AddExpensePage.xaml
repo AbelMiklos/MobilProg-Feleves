@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:GarageLog.ViewModels"
+             x:Class="GarageLog.Views.AddExpensePage"
+             x:DataType="viewmodel:AddExpenseViewModel"
+             Title="Kiadás hozzáadása">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label Text="Kiadás részletei"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,20"/>
+
+            <Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    Padding="15">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Dátum *"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    <DatePicker Date="{Binding Date}"
+                                Format="yyyy.MM.dd"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    Padding="15">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Típus *"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    <Picker ItemsSource="{Binding ExpenseTypes}"
+                            SelectedItem="{Binding SelectedExpenseType}"
+                            Title="Válassz típust">
+                        <Picker.ItemDisplayBinding>
+                            <Binding Converter="{StaticResource EnumToDescriptionConverter}" />
+                        </Picker.ItemDisplayBinding>
+                    </Picker>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    Padding="15">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Leírás *"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    <Entry Text="{Binding Description}"
+                           Placeholder="pl. Olajcsere és szűrőcsere"
+                           MaxLength="500"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    Padding="15">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Költség (Ft) *"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    <Entry Text="{Binding Cost}"
+                           Keyboard="Numeric"
+                           Placeholder="pl. 25000"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
+                <Button Grid.Column="0"
+                    Text="Mentés"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="Green"
+                    TextColor="White"/>
+                
+                <Button Grid.Column="1"
+                        Text="Mégse"
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="Gray"
+                        TextColor="White"/>
+            </Grid>
+
+            <Label Text="* Kötelező mezők"
+                   FontSize="12"
+                   TextColor="Gray"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
