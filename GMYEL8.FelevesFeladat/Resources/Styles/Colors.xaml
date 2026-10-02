@@ -5,19 +5,24 @@
 
     <!-- Note: For Android please see also Platforms\Android\Resources\values\colors.xml -->
 
-    <Color x:Key="Primary">#512BD4</Color>
-    <Color x:Key="PrimaryDark">#ac99ea</Color>
-    <Color x:Key="PrimaryDarkText">#242424</Color>
-    <Color x:Key="Secondary">#DFD8F7</Color>
-    <Color x:Key="SecondaryDarkText">#9880e5</Color>
-    <Color x:Key="Tertiary">#2B0B98</Color>
+    <!-- GarageLog Kék Paletta -->
+    <Color x:Key="Primary">#1A4B8C</Color> <!-- A fő sportos, mélykék szín -->
+    <Color x:Key="PrimaryDark">#689AE0</Color> <!-- Világosabb, jegesebb kék a sötét módhoz -->
+    <Color x:Key="PrimaryDarkText">#F4F8FA</Color> <!-- Majdnem fehér szövegszín sötétkék háttérre -->
+    <Color x:Key="Secondary">#D6E4F5</Color> <!-- Nagyon világos kék a kiemelésekhez -->
+    <Color x:Key="SecondaryDarkText">#4A7BC0</Color> 
+    <Color x:Key="Tertiary">#0A254A</Color> <!-- Nagyon sötét, éjszakai kék -->
 
     <Color x:Key="White">White</Color>
     <Color x:Key="Black">Black</Color>
-    <Color x:Key="Magenta">#D600AA</Color>
-    <Color x:Key="MidnightBlue">#190649</Color>
+    
+    <!-- Az eredeti Magenta helyett egy GTI-hangulatú sportos piros, 
+         a változó nevét viszont meghagyjuk, hogy ne törjenek el a beépített stílusok -->
+    <Color x:Key="Magenta">#E53935</Color> 
+    <Color x:Key="MidnightBlue">#0B132B</Color>
     <Color x:Key="OffBlack">#1f1f1f</Color>
 
+    <!-- UI Szürkék (ezeket érdemes meghagyni az eredetiben) -->
     <Color x:Key="Gray100">#E1E1E1</Color>
     <Color x:Key="Gray200">#C8C8C8</Color>
     <Color x:Key="Gray300">#ACACAC</Color>
@@ -27,6 +32,7 @@
     <Color x:Key="Gray900">#212121</Color>
     <Color x:Key="Gray950">#141414</Color>
 
+    <!-- Ecsetek (Brushes) a fenti színek alapján -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>

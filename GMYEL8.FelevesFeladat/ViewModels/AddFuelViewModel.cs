@@ -69,7 +69,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
 
                 if (vehicle == null)
                 {
-                    await Shell.Current.DisplayAlertAsync("Hiba", "Nincs jármû kiválasztva!", "OK");
+                    await Shell.Current.DisplayAlertAsync("Hiba", "Nincs jï¿½rmï¿½ kivï¿½lasztva!", "OK");
                     return;
                 }
 
@@ -91,7 +91,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Mentés sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Mentï¿½s sikertelen: {ex.Message}", "OK");
             }
         }
 
@@ -100,6 +100,18 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         {
             try
             {
+                var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
+
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await Permissions.RequestAsync<Permissions.Camera>();
+                    if (status != PermissionStatus.Granted)
+                    {
+                        await Shell.Current.DisplayAlertAsync("Hiba", "A kamera hasznÃ¡latÃ¡hoz engedÃ©ly szÃ¼ksÃ©ges!", "OK");
+                        return;
+                    }
+                }
+
                 if (MediaPicker.Default.IsCaptureSupported)
                 {
                     var photo = await MediaPicker.Default.CapturePhotoAsync();
@@ -117,7 +129,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Fotó készítése sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", $"FotÃ³ kÃ©szÃ­tÃ©se sikertelen: {ex.Message}", "OK");
             }
         }
 
@@ -152,7 +164,7 @@ namespace GMYEL8.FelevesFeladat.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Helymeghatározás sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Helymeghatï¿½rozï¿½s sikertelen: {ex.Message}", "OK");
             }
         }
 
@@ -164,17 +176,17 @@ namespace GMYEL8.FelevesFeladat.ViewModels
                 if (Latitude.HasValue && Longitude.HasValue)
                 {
                     var location = new Location(Latitude.Value, Longitude.Value);
-                    var options = new MapLaunchOptions { Name = LocationAddress ?? "Tankolás helyszíne" };
+                    var options = new MapLaunchOptions { Name = LocationAddress ?? "Tankolï¿½s helyszï¿½ne" };
                     await Map.Default.OpenAsync(location, options);
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlertAsync("Hiba", "Nincs mentett helyszín!", "OK");
+                    await Shell.Current.DisplayAlertAsync("Hiba", "Nincs mentett helyszï¿½n!", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Hiba", $"Térkép megnyitása sikertelen: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Hiba", $"Tï¿½rkï¿½p megnyitï¿½sa sikertelen: {ex.Message}", "OK");
             }
         }
 
@@ -188,19 +200,19 @@ namespace GMYEL8.FelevesFeladat.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Distance) || !double.TryParse(Distance, out _))
             {
-                Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes kilométert!", "OK");
+                Shell.Current.DisplayAlertAsync("Hiba", "KÃ©rlek adj meg Ã©rvÃ©nyes kilÃ³mÃ©tert!", "OK");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(FuelAmount) || !double.TryParse(FuelAmount, out _))
             {
-                Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes üzemanyag mennyiséget!", "OK");
+                Shell.Current.DisplayAlertAsync("Hiba", "KÃ©rlek adj meg Ã©rvÃ©nyes Ã¼zemanyag mennyisÃ©get!", "OK");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(PricePerLitre) || !double.TryParse(PricePerLitre, out _))
             {
-                Shell.Current.DisplayAlertAsync("Hiba", "Kérlek adj meg érvényes árat!", "OK");
+                Shell.Current.DisplayAlertAsync("Hiba", "KÃ©rlek adj meg Ã©rvÃ©nyes Ã¡rat!", "OK");
                 return false;
             }
 

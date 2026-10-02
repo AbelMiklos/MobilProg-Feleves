@@ -2,6 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+    <string>A GarageLog-nak kamerahozzáférésre van szüksége a tankolási blokkok és számlák lefotózásához, illetve a jármű állapotának dokumentálásához.</string>
+	
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>A GarageLog-nak hozzáférésre van szüksége a tartózkodási helyedhez, hogy rögzíthesse a tankolások.</string>
+
+	<key>NSMicrophoneUsageDescription</key>
+    <string>A GarageLog-nak szüksége van a mikrofonhoz való hozzáférésre a videós rögzítésekhez.</string>
+    
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>A GarageLog-nak galériahozzáférésre van szüksége a meglévő számlák és fotók feltöltéséhez.</string>
+    
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>A GarageLog-nak jogosultságra van szüksége, hogy elmenthesse az elkészült fotókat a galériába.</string>
+
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIDeviceFamily</key>
